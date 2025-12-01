@@ -35,20 +35,20 @@ export function useAmidaGame() {
     }
 
     const calculatePrizes = (
-        guestNames: string[],
         results: [string, string][]
     ) => {
-        // Create a map of Guest -> Prize
+        // Create a map of Prize -> Guest
+        // results is [Guest, Prize]
         const prizeMap = new Map<string, string>()
         results.forEach(([guest, prize]) => {
-            prizeMap.set(guest, prize)
+            prizeMap.set(prize, guest)
         })
 
         const newBottomPrizes = new Array(10).fill('???')
 
+        // Start from Top (Prizes 1..10)
         for (let i = 0; i < 10; i++) {
-            const guestName = guestNames[i]
-            if (!guestName) continue
+            const prizeName = (i + 1).toString()
 
             // Simulate path
             let currentX = i
@@ -60,9 +60,9 @@ export function useAmidaGame() {
                 }
             }
 
-            const prize = prizeMap.get(guestName)
-            if (prize) {
-                newBottomPrizes[currentX] = prize
+            const guest = prizeMap.get(prizeName)
+            if (guest) {
+                newBottomPrizes[currentX] = guest
             }
         }
         bottomPrizes.value = newBottomPrizes

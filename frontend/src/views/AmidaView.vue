@@ -72,7 +72,7 @@ const handleSubmit = async () => {
 const updatePrizes = async () => {
   const results = await fetchResults()
   if (results) {
-    calculatePrizes(items.value, results)
+    calculatePrizes(results)
   }
 }
 
@@ -259,14 +259,14 @@ const clearResult = () => {
     <div v-else class="game-panel">
       <div class="start-buttons">
         <button 
-          v-for="(item, index) in items" 
-          :key="index" 
-          @click="startAnimation(index)"
+          v-for="i in 10" 
+          :key="i" 
+          @click="startAnimation(i-1)"
           :disabled="isAnimating"
           class="choice-btn"
-          :class="{ active: selectedStart === index }"
+          :class="{ active: selectedStart === i-1 }"
         >
-          {{ item || (index + 1) }}
+          {{ i }}
         </button>
       </div>
 
