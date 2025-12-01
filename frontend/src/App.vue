@@ -1,30 +1,69 @@
 <script setup lang="ts">
-import HelloWorld from './components/HelloWorld.vue'
+import { useBingoGame } from './composables/useBingoGame'
+import SnowEffect from './components/SnowEffect.vue'
+import BingoDisplay from './components/BingoDisplay.vue'
+import BingoControls from './components/BingoControls.vue'
+import BingoHistory from './components/BingoHistory.vue'
+
+const {
+  currentNumber,
+  displayText,
+  history,
+  isSpinning,
+  spin,
+  resetGame
+} = useBingoGame()
 </script>
 
 <template>
-  <div>
-    <a href="https://vite.dev" target="_blank">
-      <img src="/vite.svg" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://vuejs.org/" target="_blank">
-      <img src="./assets/vue.svg" class="logo vue" alt="Vue logo" />
-    </a>
+  <div class="container">
+    <SnowEffect />
+    
+    <h1 class="title">🎄 Christmas Bingo 🎄</h1>
+    
+    <BingoDisplay 
+      :display-text="displayText" 
+      :current-number="currentNumber" 
+      :is-spinning="isSpinning" 
+    />
+
+    <BingoControls 
+      :is-spinning="isSpinning" 
+      @spin="spin" 
+      @reset="resetGame" 
+    />
+
+    <BingoHistory :history="history" />
   </div>
-  <HelloWorld msg="Vite + Vue" />
 </template>
 
+<style>
+/* グローバルスタイル */
+body {
+  margin: 0;
+  background: linear-gradient(135deg, #1a472a, #2d5a27);
+  color: white;
+  font-family: 'Arial Rounded MT Bold', 'Helvetica Rounded', Arial, sans-serif;
+  overflow: hidden;
+}
+</style>
+
 <style scoped>
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  position: relative;
+  z-index: 1;
 }
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.vue:hover {
-  filter: drop-shadow(0 0 2em #42b883aa);
+
+.title {
+  font-size: 3rem;
+  color: #d4af37; /* Gold */
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+  margin-bottom: 20px;
+  font-family: 'Brush Script MT', cursive;
 }
 </style>
