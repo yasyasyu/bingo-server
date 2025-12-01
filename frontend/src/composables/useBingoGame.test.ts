@@ -49,6 +49,7 @@ describe('useBingoGame', () => {
             number: 42,
             history: [1, 2, 42],
             message: 'Success',
+            seed: 123456789,
         }
         vi.mocked(bingoApi.fetchNextNumber).mockResolvedValue(mockData)
 

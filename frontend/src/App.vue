@@ -10,6 +10,7 @@ const {
   displayText,
   history,
   isSpinning,
+  seed,
   spin,
   resetGame
 } = useBingoGame()
@@ -34,6 +35,8 @@ const {
     />
 
     <BingoHistory :history="history" />
+
+    <div v-if="seed" class="seed-display">Seed: {{ seed }}</div>
   </div>
 </template>
 
@@ -65,5 +68,14 @@ body {
   text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
   margin-bottom: 20px;
   font-family: 'Brush Script MT', cursive;
+}
+
+.seed-display {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.5);
+  font-family: monospace;
 }
 </style>

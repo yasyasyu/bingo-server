@@ -7,6 +7,7 @@ pub struct NumberResponse {
     pub number: Option<u8>,
     pub history: Vec<u8>,
     pub message: String,
+    pub seed: u32,
 }
 
 pub async fn next_number(State(state): State<AppState>) -> Json<NumberResponse> {
@@ -17,12 +18,14 @@ pub async fn next_number(State(state): State<AppState>) -> Json<NumberResponse> 
             number: Some(num),
             history: game.history.clone(),
             message: "Success".to_string(),
+            seed: state.seed,
         })
     } else {
         Json(NumberResponse {
             number: None,
             history: game.history.clone(),
             message: "Game Over".to_string(),
+            seed: state.seed,
         })
     }
 }
@@ -35,5 +38,6 @@ pub async fn reset_game(State(state): State<AppState>) -> Json<NumberResponse> {
         number: None,
         history: Vec::new(),
         message: "Game Reset".to_string(),
+        seed: state.seed,
     })
 }

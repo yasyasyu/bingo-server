@@ -9,11 +9,15 @@ export function useBingoGame() {
     const displayText = ref<string | number>('Merry Christmas!')
     const history = ref<number[]>([])
     const isSpinning = ref(false)
+    const seed = ref<number | null>(null)
 
     const resetGame = async () => {
         if (!confirm('本当にリセットしますか？')) return
         try {
-            await bingoApi.resetGame()
+            const data = await bingoApi.resetGame()
+            if (data) {
+                seed.value = data.seed
+            }
             currentNumber.value = null
             displayText.value = 'Merry Christmas!'
             history.value = []
@@ -38,6 +42,7 @@ export function useBingoGame() {
             return
         }
 
+        seed.value = data.seed
         const targetNumber = data.number
 
         if (targetNumber === null) {
@@ -82,6 +87,7 @@ export function useBingoGame() {
         displayText,
         history,
         isSpinning,
+        seed,
         spin,
         resetGame,
     }
