@@ -38,6 +38,7 @@
 | `number` | `integer` \| `null` | 抽選された数字 (1-75)。数字がない場合は `null`。 |
 | `history` | `array<integer>` | これまでに抽選された全ての数字のリスト（順序保持）。 |
 | `message` | `string` | 状態を表すメッセージ。 |
+| `seed` | `integer` | 現在の乱数生成に使用されているシード値。 |
 
 ---
 
@@ -54,7 +55,8 @@
 {
   "number": null,
   "history": [],
-  "message": "Game Reset"
+  "message": "Game Reset",
+  "seed": 123456789
 }
 ```
 
@@ -63,6 +65,7 @@
 | `number` | `null` | 常に `null`。 |
 | `history` | `array` | 常に空配列 `[]`。 |
 | `message` | `string` | "Game Reset" |
+| `seed` | `integer` | 現在の乱数生成に使用されているシード値。 |
 
 ## エラーハンドリング
 サーバー内部エラーが発生した場合、標準的なHTTPステータスコード `500 Internal Server Error` が返される可能性があります。クライアント側では通信エラーとしてハンドリングすることを推奨します。
