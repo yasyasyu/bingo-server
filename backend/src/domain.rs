@@ -4,7 +4,7 @@ use std::{fmt, usize};
 pub struct AmidaGame {
     count: usize,
     pub gests: Vec<String>,
-    pub items: Vec<u8>,
+    pub prizes: Vec<u8>,
     rng: Box<dyn IRng>,
 }
 
@@ -21,14 +21,14 @@ impl AmidaGame {
         let mut game = Self {
             count,
             gests: Vec::new(),
-            items: (1..=count as u8).collect(),
+            prizes: (1..=count as u8).collect(),
             rng,
         };
         game.shuffle();
         game
     }
     fn shuffle(&mut self) {
-        self.rng.shuffle(&mut self.items);
+        self.rng.shuffle(&mut self.prizes);
     }
 
     pub fn update(&mut self, gests: Vec<String>) {
@@ -40,8 +40,8 @@ impl AmidaGame {
         }
 
         let mut result = Vec::new();
-        for (gest, item) in self.gests.iter().zip(self.items.iter()) {
-            result.push((gest.clone(), item.to_string()));
+        for (gest, prize) in self.gests.iter().zip(self.prizes.iter()) {
+            result.push((gest.clone(), prize.to_string()));
         }
 
         Some(result)

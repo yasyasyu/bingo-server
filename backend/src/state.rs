@@ -3,7 +3,7 @@ use crate::rng::XorShift;
 use std::sync::{Arc, Mutex};
 
 const BINGO_MAX_NUMBER: usize = 75;
-const ITEMS_COUNT: usize = 10;
+const AMIDA_PRIZES_COUNT: usize = 10;
 
 #[derive(Clone)]
 pub struct AppState {
@@ -20,7 +20,7 @@ impl AppState {
                 Box::new(XorShift::new(seed)),
             ))),
             amida: Arc::new(Mutex::new(AmidaGame::new(
-                ITEMS_COUNT,
+                AMIDA_PRIZES_COUNT,
                 Box::new(XorShift::shift_new(seed, BINGO_MAX_NUMBER)),
             ))),
             seed,

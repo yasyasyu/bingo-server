@@ -19,18 +19,18 @@ fn calculate_seed_from_file(path: &str) -> u32 {
     let path = Path::new(path);
     if !path.exists() {
         println!("Warning: seeds.txt not found. Using default seed.");
-        return 123456789;
+        return 0;
     }
 
     let file = match File::open(&path) {
         Ok(file) => file,
         Err(e) => {
             eprintln!("Error opening seeds.txt: {}", e);
-            return 123456789;
+            return 0;
         }
     };
 
-    let mut seed: u32 = 1;
+    let mut seed: u32 = 0;
     for line in io::BufReader::new(file).lines() {
         if let Ok(line) = line {
             if let Ok(num) = line.trim().parse::<u32>() {
@@ -38,11 +38,6 @@ fn calculate_seed_from_file(path: &str) -> u32 {
                 seed = seed.wrapping_mul(num);
             }
         }
-    }
-
-    // 0になってしまった場合は補正
-    if seed == 0 {
-        seed = 987654321;
     }
 
     println!("Calculated seed: {}", seed);
@@ -63,7 +58,7 @@ async fn main() {
         .allow_headers(Any);
 
     let app = Router::new()
-        .route("/next", get(get_next_number))
+        .route("/next_number", get(get_next_number))
         .route("/reset", post(reset_game))
         .route("/amida", post(set_amida).get(get_amida))
         .route("/amida/result", get(get_amida_result))
