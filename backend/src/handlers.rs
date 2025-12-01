@@ -21,10 +21,16 @@ pub struct AmidaResponse {
     pub message: String,
 }
 
-pub async fn next_number(State(state): State<AppState>) -> Json<NumberResponse> {
+#[derive(Serialize)]
+pub struct AmidaResultResponse {
+    pub items: Vec<(String, String)>,
+    pub message: String,
+}
+
+pub async fn get_next_number(State(state): State<AppState>) -> Json<NumberResponse> {
     let mut game = state.game.lock().unwrap();
 
-    if let Some(num) = game.draw_number() {
+    if let Some(num) = game.get_next_number() {
         Json(NumberResponse {
             number: Some(num),
             history: game.history.clone(),
@@ -53,23 +59,24 @@ pub async fn reset_game(State(state): State<AppState>) -> Json<NumberResponse> {
     })
 }
 
-pub async fn get_amida(State(state): State<AppState>) -> Json<AmidaResponse> {
-    let amida = state.amida.lock().unwrap();
-    Json(AmidaResponse {
-        items: amida.items.clone(),
-        message: "Success".to_string(),
-    })
-}
-
-pub async fn setup_amida(
+pub async fn set_amida(
     State(state): State<AppState>,
     Json(payload): Json<AmidaRequest>,
 ) -> Json<AmidaResponse> {
     let mut amida = state.amida.lock().unwrap();
     amida.update(payload.items);
-
     Json(AmidaResponse {
-        items: amida.items.clone(),
+        items: amida.gests.clone(),
         message: "Updated".to_string(),
+    })
+}
+
+pub async fn get_amida_result(State(state): State<AppState>) -> Json<AmidaResultResponse> {
+    let amida = state.amida.lock().unwrap();
+    let result = amida.get_result();
+    // ゲストと景品の組み合わせを返す
+    Json(AmidaResultResponse {
+        items: result.unwrap_or_default(),
+        message: "Success".to_string(),
     })
 }
