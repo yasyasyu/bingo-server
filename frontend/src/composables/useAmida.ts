@@ -12,8 +12,6 @@ const items = ref<string[]>(new Array(10).fill(''))
 const isConfigured = ref(false)
 const isLoading = ref(false)
 const error = ref<string | null>(null)
-const horizontalLines = ref<{ level: number, leftIndex: number }[]>([])
-const revealedIndices = ref<Set<number>>(new Set())
 
 export function useAmida() {
     const fetchAmida = async () => {
@@ -64,8 +62,6 @@ export function useAmida() {
         isConfigured,
         isLoading,
         error,
-        horizontalLines,
-        revealedIndices,
         fetchAmida,
         setupAmida
     }

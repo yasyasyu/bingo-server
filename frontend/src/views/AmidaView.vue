@@ -2,10 +2,11 @@
 import { onMounted, ref, nextTick } from 'vue'
 import { useAmida } from '../composables/useAmida'
 
-const { items, isConfigured, isLoading, horizontalLines, revealedIndices, fetchAmida, setupAmida } = useAmida()
+const { items, isConfigured, isLoading, fetchAmida, setupAmida } = useAmida()
 
 // Setup Mode State
 const inputItems = ref<string[]>(new Array(10).fill(''))
+const revealedIndices = ref<Set<number>>(new Set())
 
 // Game Mode State
 const canvasRef = ref<HTMLCanvasElement | null>(null)
@@ -15,14 +16,13 @@ const resultIndex = ref<number | null>(null)
 
 // Amida Structure
 const HORIZONTAL_LINES_COUNT = 15
+const horizontalLines = ref<{ level: number, leftIndex: number }[]>([])
 
 onMounted(async () => {
   await fetchAmida()
   if (isConfigured.value) {
     inputItems.value = [...items.value]
-    if (horizontalLines.value.length === 0) {
-      generateAmida()
-    }
+    generateAmida()
     await nextTick()
     drawAmida()
   }
@@ -36,7 +36,6 @@ const handleSubmit = async () => {
 }
 
 const generateAmida = () => {
-  revealedIndices.value.clear()
   const lines: { level: number, leftIndex: number }[] = []
   // Generate random horizontal lines
   // Ensure no overlapping lines at same level
@@ -243,22 +242,22 @@ const clearResult = () => {
     <div v-else class="game-panel">
       <div class="start-buttons">
         <button 
-          v-for="i in 10" 
-          :key="i" 
-          @click="startAnimation(i-1)"
+          v-for="(item, index) in items" 
+          :key="index" 
+          @click="startAnimation(index)"
           :disabled="isAnimating"
           class="choice-btn"
-          :class="{ active: selectedStart === i-1 }"
+          :class="{ active: selectedStart === index }"
         >
-          {{ i }}
+          {{ item || (index + 1) }}
         </button>
       </div>
 
       <canvas ref="canvasRef" width="800" height="500" class="amida-canvas"></canvas>
 
       <div class="results-row">
-        <div v-for="(item, index) in items" :key="index" class="result-item" :class="{ highlight: resultIndex === index }">
-          {{ revealedIndices.has(index) ? item : '???' }}
+        <div v-for="i in 10" :key="i" class="result-item" :class="{ highlight: resultIndex === i-1 }">
+          {{ revealedIndices.has(i-1) ? i : '???' }}
         </div>
       </div>
 
@@ -357,15 +356,23 @@ const clearResult = () => {
 }
 
 .choice-btn {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
+  min-width: 40px;
+  width: 60px; /* Fixed width to align with grid */
+  height: auto;
+  min-height: 40px;
+  padding: 5px;
+  border-radius: 5px;
   border: 2px solid white;
   background: rgba(255, 255, 255, 0.2);
   color: white;
   font-weight: bold;
   cursor: pointer;
   transition: all 0.3s;
+  font-size: 0.8rem;
+  word-break: break-word;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .choice-btn:hover {
