@@ -68,7 +68,7 @@ classDiagram
 
     class AmidaGame {
         +Vec~String~ gests
-        +Vec~u8~ items
+        +Vec~u8~ prizes
         -Box~dyn IRng~ rng
         +new(count: usize, rng: Box~dyn IRng~) Self
         +update(gests: Vec~String~)
@@ -140,8 +140,14 @@ classDiagram
 
     class AmidaView {
         <<View>>
-        +setupMode
-        +gameMode
+    }
+
+    class AmidaSetup {
+        <<Component>>
+    }
+
+    class AmidaBoard {
+        <<Component>>
     }
 
     class useAmida {
@@ -175,6 +181,8 @@ classDiagram
     BingoView *-- BingoControls
     BingoView *-- BingoHistory
     BingoView ..> useBingoGame : Uses
+    AmidaView *-- AmidaSetup
+    AmidaView *-- AmidaBoard
     AmidaView ..> useAmida : Uses
     AmidaView ..> useAmidaGame : Uses
     useBingoGame ..> bingoApi : Uses

@@ -26,6 +26,8 @@
 UIコンポーネントとロジック、通信処理を分離しています。
 
 *   `src/components/`: **UIコンポーネント**。表示とユーザー操作の受け付けのみを担当。
+    *   `AmidaSetup.vue`: あみだくじの設定（名前入力）フォーム。
+    *   `AmidaBoard.vue`: あみだくじの描画、アニメーション、結果表示。
 *   `src/composables/`: **アプリケーションロジック**。画面の状態管理や演出の制御。
     *   `useBingoGame.ts`: ビンゴゲームのロジック。
     *   `useAmida.ts`: あみだくじの状態管理（ViewModel）。

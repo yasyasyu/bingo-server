@@ -39,7 +39,9 @@ Vue.js + TypeScript (Vite) で実装されたSPAです。
 | ├── `BingoDisplay.vue` | 中央の数字表示パネル |
 | ├── `BingoControls.vue` | SPIN/RESETボタン |
 | ├── `BingoHistory.vue` | 抽選履歴のリスト表示 |
-| └── `SnowEffect.vue` | 背景の雪のアニメーション |
+| ├── `SnowEffect.vue` | 背景の雪のアニメーション |
+| ├── `AmidaSetup.vue` | あみだくじ設定（名前入力）フォーム |
+| └── `AmidaBoard.vue` | あみだくじ描画・アニメーション・結果表示 |
 | `src/views/` | **ページコンポーネント**。ルーティングに対応する画面全体。 |
 | ├── `BingoView.vue` | ビンゴゲーム画面 |
 | └── `AmidaView.vue` | あみだくじ画面（設定・ゲーム） |
