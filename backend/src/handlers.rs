@@ -59,6 +59,14 @@ pub async fn reset_game(State(state): State<AppState>) -> Json<NumberResponse> {
     })
 }
 
+pub async fn get_amida(State(state): State<AppState>) -> Json<AmidaResponse> {
+    let amida = state.amida.lock().unwrap();
+    Json(AmidaResponse {
+        items: amida.gests.clone(),
+        message: "Success".to_string(),
+    })
+}
+
 pub async fn set_amida(
     State(state): State<AppState>,
     Json(payload): Json<AmidaRequest>,

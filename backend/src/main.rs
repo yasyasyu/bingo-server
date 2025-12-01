@@ -8,7 +8,7 @@ use axum::{
     http::Method,
     routing::{get, post},
 };
-use handlers::{get_amida_result, get_next_number, reset_game, set_amida};
+use handlers::{get_amida, get_amida_result, get_next_number, reset_game, set_amida};
 use state::AppState;
 use std::fs::File;
 use std::io::{self, BufRead};
@@ -65,7 +65,7 @@ async fn main() {
     let app = Router::new()
         .route("/next", get(get_next_number))
         .route("/reset", post(reset_game))
-        .route("/amida", post(set_amida))
+        .route("/amida", post(set_amida).get(get_amida))
         .route("/amida/result", get(get_amida_result))
         .layer(cors)
         .with_state(state);
