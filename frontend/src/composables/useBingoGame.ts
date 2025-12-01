@@ -1,5 +1,6 @@
 import { ref } from 'vue'
 import { useAudio } from './useAudio'
+import { bingoApi } from '../services/bingoApi'
 
 export function useBingoGame() {
     const { playBeep, playWin, resumeAudioContext } = useAudio()
@@ -9,21 +10,10 @@ export function useBingoGame() {
     const history = ref<number[]>([])
     const isSpinning = ref(false)
 
-    const fetchNextNumber = async () => {
-        try {
-            const res = await fetch('http://localhost:3000/next')
-            const data = await res.json()
-            return data
-        } catch (e) {
-            console.error(e)
-            return null
-        }
-    }
-
     const resetGame = async () => {
         if (!confirm('本当にリセットしますか？')) return
         try {
-            await fetch('http://localhost:3000/reset', { method: 'POST' })
+            await bingoApi.resetGame()
             currentNumber.value = null
             displayText.value = 'Merry Christmas!'
             history.value = []
@@ -40,7 +30,7 @@ export function useBingoGame() {
         isSpinning.value = true
 
         // バックエンドから数字取得
-        const data = await fetchNextNumber()
+        const data = await bingoApi.fetchNextNumber()
 
         if (!data) {
             isSpinning.value = false
