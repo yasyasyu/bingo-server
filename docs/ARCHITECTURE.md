@@ -68,6 +68,8 @@ classDiagram
         <<Module>>
         +next_number(State) Json
         +reset_game(State) Json
+        +get_amida(State) Json
+        +setup_amida(State) Json
     }
     
     class NumberResponse {
@@ -78,9 +80,17 @@ classDiagram
         +u32 seed
     }
 
+    class AmidaResponse {
+        <<Struct>>
+        +Vec~String~ items
+        +String message
+    }
+
     Handlers ..> AppState : Uses via Axum State
     Handlers ..> NumberResponse : Returns
+    Handlers ..> AmidaResponse : Returns
     AppState o-- BingoGame : Contains (Thread Safe)
+    AppState o-- AmidaGame : Contains (Thread Safe)
     BingoGame o-- BingoRng : Depends on (DI)
     XorShift ..|> BingoRng : Implements
 ```
@@ -96,6 +106,22 @@ classDiagram
 
     class App {
         <<View>>
+    }
+    
+    class Router {
+        /
+        /amida
+        /amida/result
+    }
+
+    class BingoView {
+        <<View>>
+    }
+
+    class AmidaView {
+        <<View>>
+        +setupMode
+        +gameMode
     }
 
     class BingoDisplay {
@@ -137,10 +163,22 @@ classDiagram
         +playWin()
     }
 
-    App *-- BingoDisplay
-    App *-- BingoControls
-    App *-- BingoHistory
-    App ..> useBingoGame : Uses
+    class useAmida {
+        <<Composable>>
+        +Ref~array~ items
+        +Ref~boolean~ isConfigured
+        +fetchAmida()
+        +setupAmida()
+    }
+
+    App *-- Router
+    Router --> BingoView
+    Router --> AmidaView
+    BingoView *-- BingoDisplay
+    BingoView *-- BingoControls
+    BingoView *-- BingoHistory
+    BingoView ..> useBingoGame : Uses
+    AmidaView ..> useAmida : Uses
     useBingoGame ..> bingoApi : Uses
     useBingoGame ..> useAudio : Uses
 ```

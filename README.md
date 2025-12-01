@@ -38,6 +38,10 @@ npm run dev
 ```
 ブラウザで表示されるURL（通常は `http://localhost:5173`）にアクセスしてください。
 
+### 機能へのアクセス
+- **ビンゴ**: `http://localhost:5173/`
+- **あみだくじ**: `http://localhost:5173/amida`
+
 ## 🛠️ 技術スタック
 - **Backend**: Rust, Axum, Tokio
 - **Frontend**: Vue.js 3, TypeScript, Vite

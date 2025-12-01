@@ -40,8 +40,12 @@ Vue.js + TypeScript (Vite) で実装されたSPAです。
 | ├── `BingoControls.vue` | SPIN/RESETボタン |
 | ├── `BingoHistory.vue` | 抽選履歴のリスト表示 |
 | └── `SnowEffect.vue` | 背景の雪のアニメーション |
+| `src/views/` | **ページコンポーネント**。ルーティングに対応する画面全体。 |
+| ├── `BingoView.vue` | ビンゴゲーム画面 |
+| └── `AmidaView.vue` | あみだくじ画面（設定・ゲーム） |
 | `src/composables/` | **ロジック層**。VueのComposition APIを使用した再利用可能なロジック。 |
 | ├── `useBingoGame.ts` | ゲームの進行管理、状態保持、API呼び出しの制御 |
+| ├── `useAmida.ts` | あみだくじのデータ取得・更新ロジック |
 | └── `useAudio.ts` | Web Audio APIを使用した効果音の再生制御 |
 | `src/services/` | **インフラ層**。外部システム（API）との通信を担当。 |
 | └── `bingoApi.ts` | バックエンドAPIへのfetch処理をカプセル化 |

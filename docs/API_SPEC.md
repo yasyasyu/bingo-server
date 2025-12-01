@@ -72,3 +72,55 @@
 
 ## CORS設定
 開発環境向けに、全てのオリジン (`*`) からの `GET`, `POST` リクエストを許可しています。
+
+---
+
+### 3. あみだくじデータ取得 (Get Amida)
+
+現在のあみだくじの設定（景品名）を取得します。
+
+*   **URL**: `/amida`
+*   **Method**: `GET`
+
+#### レスポンス
+
+```json
+{
+  "items": ["Prize A", "Prize B", ...],
+  "message": "Success"
+}
+```
+
+| フィールド | 型 | 説明 |
+| :--- | :--- | :--- |
+| `items` | `array<string>` | 設定された10個の景品名のリスト。未設定の場合は空文字が含まれる。 |
+| `message` | `string` | "Success" |
+
+---
+
+### 4. あみだくじ設定 (Setup Amida)
+
+あみだくじの景品名を設定します。
+
+*   **URL**: `/amida/setup`
+*   **Method**: `POST`
+*   **Body**:
+    ```json
+    {
+      "items": ["Prize A", "Prize B", ...]
+    }
+    ```
+
+#### レスポンス
+
+```json
+{
+  "items": ["Prize A", "Prize B", ...],
+  "message": "Updated"
+}
+```
+
+| フィールド | 型 | 説明 |
+| :--- | :--- | :--- |
+| `items` | `array<string>` | 更新後の景品名リスト。 |
+| `message` | `string` | "Updated" |
