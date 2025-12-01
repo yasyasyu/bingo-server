@@ -79,6 +79,7 @@ classDiagram
         <<Module>>
         +get_next_number(State) Json
         +reset_game(State) Json
+        +get_amida(State) Json
         +set_amida(State) Json
         +get_amida_result(State) Json
     }
@@ -186,7 +187,7 @@ classDiagram
         <<Composable>>
         +Ref~array~ items
         +Ref~boolean~ isConfigured
-        +fetchAmida()
+        +fetchAmidaResult()
         +setupAmida()
     }
 
