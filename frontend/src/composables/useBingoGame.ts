@@ -2,14 +2,15 @@ import { ref } from 'vue'
 import { useAudio } from './useAudio'
 import { bingoApi } from '../services/bingoApi'
 
+// Global State
+const currentNumber = ref<number | null>(null)
+const displayText = ref<string | number>('Merry Christmas!')
+const history = ref<number[]>([])
+const isSpinning = ref(false)
+const seed = ref<number | null>(null)
+
 export function useBingoGame() {
     const { playBeep, playWin, resumeAudioContext } = useAudio()
-
-    const currentNumber = ref<number | null>(null)
-    const displayText = ref<string | number>('Merry Christmas!')
-    const history = ref<number[]>([])
-    const isSpinning = ref(false)
-    const seed = ref<number | null>(null)
 
     const resetGame = async () => {
         if (!confirm('本当にリセットしますか？')) return

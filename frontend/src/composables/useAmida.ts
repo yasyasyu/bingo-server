@@ -7,12 +7,15 @@ export interface AmidaResponse {
     message: string
 }
 
-export function useAmida() {
-    const items = ref<string[]>(new Array(10).fill(''))
-    const isConfigured = ref(false)
-    const isLoading = ref(false)
-    const error = ref<string | null>(null)
+// Global State
+const items = ref<string[]>(new Array(10).fill(''))
+const isConfigured = ref(false)
+const isLoading = ref(false)
+const error = ref<string | null>(null)
+const horizontalLines = ref<{ level: number, leftIndex: number }[]>([])
+const revealedIndices = ref<Set<number>>(new Set())
 
+export function useAmida() {
     const fetchAmida = async () => {
         isLoading.value = true
         try {
@@ -61,6 +64,8 @@ export function useAmida() {
         isConfigured,
         isLoading,
         error,
+        horizontalLines,
+        revealedIndices,
         fetchAmida,
         setupAmida
     }

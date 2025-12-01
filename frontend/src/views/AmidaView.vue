@@ -2,7 +2,7 @@
 import { onMounted, ref, nextTick } from 'vue'
 import { useAmida } from '../composables/useAmida'
 
-const { items, isConfigured, isLoading, fetchAmida, setupAmida } = useAmida()
+const { items, isConfigured, isLoading, horizontalLines, revealedIndices, fetchAmida, setupAmida } = useAmida()
 
 // Setup Mode State
 const inputItems = ref<string[]>(new Array(10).fill(''))
@@ -15,13 +15,14 @@ const resultIndex = ref<number | null>(null)
 
 // Amida Structure
 const HORIZONTAL_LINES_COUNT = 15
-const horizontalLines = ref<{ level: number, leftIndex: number }[]>([])
 
 onMounted(async () => {
   await fetchAmida()
   if (isConfigured.value) {
     inputItems.value = [...items.value]
-    generateAmida()
+    if (horizontalLines.value.length === 0) {
+      generateAmida()
+    }
     await nextTick()
     drawAmida()
   }
@@ -35,6 +36,7 @@ const handleSubmit = async () => {
 }
 
 const generateAmida = () => {
+  revealedIndices.value.clear()
   const lines: { level: number, leftIndex: number }[] = []
   // Generate random horizontal lines
   // Ensure no overlapping lines at same level
@@ -170,6 +172,9 @@ const startAnimation = async (startIndex: number) => {
   )
 
   resultIndex.value = currentXIndex
+  if (currentXIndex !== null) {
+    revealedIndices.value.add(currentXIndex)
+  }
   isAnimating.value = false
 }
 
@@ -204,6 +209,7 @@ const resetView = () => {
   isConfigured.value = false
   resultIndex.value = null
   selectedStart.value = null
+  revealedIndices.value.clear()
   drawAmida() // Clear canvas effectively
 }
 
@@ -252,7 +258,7 @@ const clearResult = () => {
 
       <div class="results-row">
         <div v-for="(item, index) in items" :key="index" class="result-item" :class="{ highlight: resultIndex === index }">
-          {{ item }}
+          {{ revealedIndices.has(index) ? item : '???' }}
         </div>
       </div>
 
