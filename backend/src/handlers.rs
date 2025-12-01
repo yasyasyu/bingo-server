@@ -1,6 +1,6 @@
 use crate::state::AppState;
 use axum::{Json, extract::State};
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize)]
 pub struct NumberResponse {
@@ -8,6 +8,17 @@ pub struct NumberResponse {
     pub history: Vec<u8>,
     pub message: String,
     pub seed: u32,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct AmidaRequest {
+    pub items: Vec<String>,
+}
+
+#[derive(Serialize)]
+pub struct AmidaResponse {
+    pub items: Vec<String>,
+    pub message: String,
 }
 
 pub async fn next_number(State(state): State<AppState>) -> Json<NumberResponse> {
@@ -39,5 +50,26 @@ pub async fn reset_game(State(state): State<AppState>) -> Json<NumberResponse> {
         history: Vec::new(),
         message: "Game Reset".to_string(),
         seed: state.seed,
+    })
+}
+
+pub async fn get_amida(State(state): State<AppState>) -> Json<AmidaResponse> {
+    let amida = state.amida.lock().unwrap();
+    Json(AmidaResponse {
+        items: amida.items.clone(),
+        message: "Success".to_string(),
+    })
+}
+
+pub async fn setup_amida(
+    State(state): State<AppState>,
+    Json(payload): Json<AmidaRequest>,
+) -> Json<AmidaResponse> {
+    let mut amida = state.amida.lock().unwrap();
+    amida.update(payload.items);
+
+    Json(AmidaResponse {
+        items: amida.items.clone(),
+        message: "Updated".to_string(),
     })
 }

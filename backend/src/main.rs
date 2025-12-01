@@ -8,7 +8,7 @@ use axum::{
     http::Method,
     routing::{get, post},
 };
-use handlers::{next_number, reset_game};
+use handlers::{get_amida, next_number, reset_game, setup_amida};
 use state::AppState;
 use std::fs::File;
 use std::io::{self, BufRead};
@@ -59,11 +59,14 @@ async fn main() {
 
     let cors = CorsLayer::new()
         .allow_origin(Any)
-        .allow_methods([Method::GET, Method::POST]);
+        .allow_methods([Method::GET, Method::POST])
+        .allow_headers(Any);
 
     let app = Router::new()
         .route("/next", get(next_number))
         .route("/reset", post(reset_game))
+        .route("/amida", get(get_amida))
+        .route("/amida/setup", post(setup_amida))
         .layer(cors)
         .with_state(state);
 

@@ -1,6 +1,25 @@
 use crate::rng::BingoRng;
 use std::fmt;
 
+#[derive(Clone, Debug)]
+pub struct AmidaGame {
+    pub items: Vec<String>,
+}
+
+impl AmidaGame {
+    pub fn new() -> Self {
+        Self {
+            items: vec![String::new(); 10],
+        }
+    }
+
+    pub fn update(&mut self, items: Vec<String>) {
+        if items.len() == 10 {
+            self.items = items;
+        }
+    }
+}
+
 pub struct BingoGame {
     pub remaining_numbers: Vec<u8>,
     pub history: Vec<u8>,
