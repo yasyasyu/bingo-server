@@ -1,7 +1,10 @@
 <script setup lang="ts">
-import { onMounted, ref, nextTick } from 'vue'
+import { onMounted, ref, nextTick, watch } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { useAmida } from '../composables/useAmida'
 
+const router = useRouter()
+const route = useRoute()
 const { items, isConfigured, isLoading, fetchAmida, setupAmida } = useAmida()
 
 // Setup Mode State
@@ -22,7 +25,25 @@ onMounted(async () => {
   await fetchAmida()
   if (isConfigured.value) {
     inputItems.value = [...items.value]
-    generateAmida()
+    if (route.path === '/amida/result') {
+      generateAmida()
+      await nextTick()
+      drawAmida()
+    }
+  } else if (route.path === '/amida/result') {
+    router.replace('/amida')
+  }
+})
+
+watch(() => route.path, async (newPath) => {
+  if (newPath === '/amida/result') {
+    if (!isConfigured.value) {
+      router.replace('/amida')
+      return
+    }
+    if (horizontalLines.value.length === 0) {
+      generateAmida()
+    }
     await nextTick()
     drawAmida()
   }
@@ -30,6 +51,7 @@ onMounted(async () => {
 
 const handleSubmit = async () => {
   await setupAmida(inputItems.value)
+  router.push('/amida/result')
   generateAmida()
   await nextTick()
   drawAmida()
@@ -209,7 +231,7 @@ const resetView = () => {
   resultIndex.value = null
   selectedStart.value = null
   revealedIndices.value.clear()
-  drawAmida() // Clear canvas effectively
+  router.push('/amida')
 }
 
 const clearResult = () => {
@@ -225,7 +247,7 @@ const clearResult = () => {
     <h1 class="title">🎅 Amidakuji 🎅</h1>
 
     <!-- Setup Mode -->
-    <div v-if="!isConfigured" class="setup-panel">
+    <div v-if="route.path === '/amida'" class="setup-panel">
       <h2>Enter 10 Items</h2>
       <div class="inputs-grid">
         <div v-for="(_item, index) in inputItems" :key="index" class="input-group">

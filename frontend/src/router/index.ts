@@ -14,6 +14,11 @@ const router = createRouter({
             path: '/amida',
             name: 'amida',
             component: AmidaView
+        },
+        {
+            path: '/amida/result',
+            name: 'amida-result',
+            component: AmidaView
         }
     ]
 })
