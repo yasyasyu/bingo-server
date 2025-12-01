@@ -1,11 +1,5 @@
 import { ref } from 'vue'
-
-const API_BASE = 'http://localhost:3000'
-
-export interface AmidaResponse {
-    items: string[]
-    message: string
-}
+import { amidaApi } from '../services/amidaApi'
 
 // Global State
 const items = ref<string[]>(new Array(10).fill(''))
@@ -17,9 +11,7 @@ export function useAmida() {
     const fetchAmida = async () => {
         isLoading.value = true
         try {
-            const res = await fetch(`${API_BASE}/amida`)
-            if (!res.ok) throw new Error('Failed to fetch amida')
-            const data: AmidaResponse = await res.json()
+            const data = await amidaApi.fetchSettings()
 
             // Check if items are actually set (not all empty)
             const hasContent = data.items.some(item => item.trim() !== '')
@@ -39,15 +31,7 @@ export function useAmida() {
     const setupAmida = async (newItems: string[]) => {
         isLoading.value = true
         try {
-            const res = await fetch(`${API_BASE}/amida`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ items: newItems })
-            })
-            if (!res.ok) throw new Error('Failed to setup amida')
-            const data: AmidaResponse = await res.json()
+            const data = await amidaApi.updateSettings(newItems)
             items.value = data.items
             isConfigured.value = true
         } catch (e) {
@@ -60,9 +44,7 @@ export function useAmida() {
     const fetchResults = async () => {
         isLoading.value = true
         try {
-            const res = await fetch(`${API_BASE}/amida/result`)
-            if (!res.ok) throw new Error('Failed to fetch results')
-            const data: { items: [string, string][], message: string } = await res.json()
+            const data = await amidaApi.fetchResults()
             return data.items
         } catch (e) {
             error.value = e instanceof Error ? e.message : 'Unknown error'
