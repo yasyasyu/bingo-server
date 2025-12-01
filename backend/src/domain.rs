@@ -1,10 +1,15 @@
 use crate::rng::IRng;
 use std::{fmt, usize};
 
+/// あみだくじゲームのドメインロジック
 pub struct AmidaGame {
+    /// 参加者数
     count: usize,
+    /// 参加者名リスト
     pub gests: Vec<String>,
+    /// 景品番号リスト (内部でシャッフルされる)
     pub prizes: Vec<u8>,
+    /// 乱数生成器
     rng: Box<dyn IRng>,
 }
 
@@ -17,6 +22,11 @@ impl fmt::Debug for AmidaGame {
 }
 
 impl AmidaGame {
+    /// 新しいあみだくじゲームを作成する
+    ///
+    /// # Arguments
+    /// * `count` - 参加者数
+    /// * `rng` - 乱数生成器
     pub fn new(count: usize, rng: Box<dyn IRng>) -> Self {
         let mut game = Self {
             count,
@@ -27,13 +37,26 @@ impl AmidaGame {
         game.shuffle();
         game
     }
+
+    /// 景品番号をシャッフルする
     fn shuffle(&mut self) {
         self.rng.shuffle(&mut self.prizes);
     }
 
+    /// 参加者リストを更新する
+    ///
+    /// # Arguments
+    /// * `gests` - 新しい参加者リスト
     pub fn update(&mut self, gests: Vec<String>) {
         self.gests = gests;
     }
+
+    /// 結果を取得する
+    ///
+    /// 参加者数が設定値と一致する場合のみ結果を返す
+    ///
+    /// # Returns
+    /// * `Option<Vec<(String, String)>>` - (参加者名, 景品番号) のペアリスト
     pub fn get_result(&self) -> Option<Vec<(String, String)>> {
         if self.gests.len() != self.count {
             return None;
@@ -48,10 +71,15 @@ impl AmidaGame {
     }
 }
 
+/// ビンゴゲームのドメインロジック
 pub struct BingoGame {
+    /// 数字の最大値
     count: usize,
+    /// 残りの数字リスト
     pub remaining_numbers: Vec<u8>,
+    /// 抽選履歴
     pub history: Vec<u8>,
+    /// 乱数生成器
     rng: Box<dyn IRng>,
 }
 
@@ -65,6 +93,11 @@ impl fmt::Debug for BingoGame {
 }
 
 impl BingoGame {
+    /// 新しいビンゴゲームを作成する
+    ///
+    /// # Arguments
+    /// * `count` - 数字の最大値 (例: 75)
+    /// * `rng` - 乱数生成器
     pub fn new(count: usize, rng: Box<dyn IRng>) -> Self {
         let mut game = Self {
             count,
@@ -76,10 +109,15 @@ impl BingoGame {
         game
     }
 
+    /// 数字をシャッフルする
     fn shuffle(&mut self) {
         self.rng.shuffle(&mut self.remaining_numbers);
     }
 
+    /// 次の数字を抽選する
+    ///
+    /// # Returns
+    /// * `Option<u8>` - 抽選された数字。全て出尽くした場合はNone
     pub fn get_next_number(&mut self) -> Option<u8> {
         if let Some(num) = self.remaining_numbers.pop() {
             self.history.push(num);
@@ -89,6 +127,9 @@ impl BingoGame {
         }
     }
 
+    /// ゲームをリセットする
+    ///
+    /// 数字を全て戻し、再度シャッフルする
     pub fn reset(&mut self) {
         self.remaining_numbers = (1..=self.count as u8).collect();
         self.history.clear();

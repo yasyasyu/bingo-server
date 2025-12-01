@@ -7,7 +7,16 @@ export interface NumberResponse {
 
 const API_BASE = 'http://localhost:3000'
 
+/**
+ * ビンゴゲームに関するAPI呼び出しを行うサービス
+ */
 export const bingoApi = {
+    /**
+     * 次のビンゴ番号を取得します
+     * 
+     * サーバー側で乱数生成を行い、新しい番号とこれまでの履歴を返します。
+     * すべての番号が出尽くした場合は null が返る可能性があります。
+     */
     async fetchNextNumber(): Promise<NumberResponse | null> {
         try {
             const res = await fetch(`${API_BASE}/next_number`)
@@ -19,6 +28,11 @@ export const bingoApi = {
         }
     },
 
+    /**
+     * ビンゴゲームをリセットします
+     * 
+     * 履歴をクリアし、新しいシード値でゲームを再開します。
+     */
     async resetGame(): Promise<NumberResponse | null> {
         try {
             const res = await fetch(`${API_BASE}/reset`, { method: 'POST' })
