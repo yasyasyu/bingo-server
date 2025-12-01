@@ -92,6 +92,7 @@ impl BingoGame {
     pub fn reset(&mut self) {
         self.remaining_numbers = (1..=self.count as u8).collect();
         self.history.clear();
+        self.rng.reset();
         self.shuffle();
     }
 }

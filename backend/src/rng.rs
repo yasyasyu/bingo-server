@@ -4,19 +4,23 @@ pub trait IRng: Send + Sync {
     fn next_u32(&mut self) -> u32;
     fn shuffle(&mut self, slice: &mut [u8]);
     fn shift(&mut self, shift: usize);
+    fn reset(&mut self);
 }
-
 #[derive(Clone)]
 pub struct XorShift {
+    initial_state: u32,
     state: u32,
 }
 
 impl XorShift {
     pub fn new(seed: u32) -> Self {
         // seedが0だとXorShiftは動かないので、0の場合は適当な値にする
-        Self {
-            state: if seed != 0 { seed } else { DEFAULT_SEED },
-        }
+        let mut rng = Self {
+            initial_state: if seed != 0 { seed } else { DEFAULT_SEED },
+            state: 0,
+        };
+        rng.reset();
+        rng
     }
     pub fn shift_new(seed: u32, shift: usize) -> Self {
         let mut rng = Self::new(seed);
@@ -55,5 +59,8 @@ impl IRng for XorShift {
         for _ in 0..shift {
             self.next_u32();
         }
+    }
+    fn reset(&mut self) {
+        self.state = self.initial_state.clone();
     }
 }
