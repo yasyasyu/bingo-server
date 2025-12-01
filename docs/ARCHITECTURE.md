@@ -144,51 +144,28 @@ classDiagram
         +gameMode
     }
 
-    class BingoDisplay {
-        <<Component>>
-        +Props: displayText
-        +Props: currentNumber
-    }
-
-    class BingoControls {
-        <<Component>>
-        +Props: isSpinning
-        +Emits: spin
-        +Emits: reset
-    }
-
-    class BingoHistory {
-        <<Component>>
-        +Props: history
-    }
-
-    class useBingoGame {
-        <<Composable>>
-        +Ref~number~ currentNumber
-        +Ref~string~ displayText
-        +Ref~array~ history
-        +spin()
-        +resetGame()
-    }
-
-    class bingoApi {
-        <<Service>>
-        +fetchNextNumber()
-        +resetGame()
-    }
-
-    class useAudio {
-        <<Composable>>
-        +playBeep()
-        +playWin()
-    }
-
     class useAmida {
         <<Composable>>
         +Ref~array~ items
         +Ref~boolean~ isConfigured
-        +fetchAmidaResult()
+        +fetchAmida()
         +setupAmida()
+        +fetchResults()
+    }
+
+    class useAmidaGame {
+        <<Composable>>
+        +Ref~array~ horizontalLines
+        +Ref~array~ bottomPrizes
+        +generateAmida()
+        +calculatePrizes()
+    }
+
+    class amidaApi {
+        <<Service>>
+        +fetchSettings()
+        +updateSettings()
+        +fetchResults()
     }
 
     App *-- Router
@@ -199,8 +176,10 @@ classDiagram
     BingoView *-- BingoHistory
     BingoView ..> useBingoGame : Uses
     AmidaView ..> useAmida : Uses
+    AmidaView ..> useAmidaGame : Uses
     useBingoGame ..> bingoApi : Uses
     useBingoGame ..> useAudio : Uses
+    useAmida ..> amidaApi : Uses
 ```
 
 ## 4. 処理フロー (シーケンス図)
@@ -230,7 +209,7 @@ sequenceDiagram
     rect rgb(255, 240, 245)
         note right of Logic: Data Fetching
         Logic->>API: fetchNextNumber()
-        API->>Server: GET /next
+        API->>Server: GET /next_number
         Server->>Domain: draw_number()
         Domain-->>Server: number (e.g. 42)
         Server-->>API: JSON Response
@@ -264,25 +243,35 @@ sequenceDiagram
     actor User
     participant UI as AmidaView
     participant Logic as useAmida
+    participant API as amidaApi
     participant Server as Backend Handler
     participant Domain as AmidaGame
 
     note over User, Domain: Phase 1: Setup
-    User->>UI: Input Names & Click "Start"
+    User->>UI: Input Name (Blur)
     UI->>Logic: setupAmida(names)
-    Logic->>Server: POST /amida
+    Logic->>API: updateSettings(names)
+    API->>Server: POST /amida
     Server->>Domain: update(names)
     Domain-->>Server: ok
-    Server-->>Logic: { items: [...], message: "Updated" }
-    Logic->>UI: Navigate to Game View
+    Server-->>API: { items: [...], message: "Updated" }
+    API-->>Logic: Success
 
-    note over User, Domain: Phase 2: Play (Result)
-    User->>UI: Click Guest Button
-    UI->>Logic: Request Result
-    Logic->>Server: GET /amida/result
+    note over User, Domain: Phase 2: Start Game
+    User->>UI: Click "Start Game"
+    UI->>Logic: fetchResults()
+    Logic->>API: fetchResults()
+    API->>Server: GET /amida/result
     Server->>Domain: get_result()
-    note right of Domain: Pair guests with<br/>shuffled numbers
     Domain-->>Server: [(GuestA, 3), (GuestB, 1)...]
-    Server-->>Logic: { items: [...], message: "Success" }
-    Logic->>UI: Animate & Show Result
+    Server-->>API: { items: [...], message: "Success" }
+    API-->>Logic: Results
+    Logic->>UI: Navigate if valid
+
+    note over User, Domain: Phase 3: Play
+    UI->>UI: generateAmida() (Random Lines)
+    UI->>UI: calculatePrizes() (Map Results to Path)
+    User->>UI: Click Guest Button
+    UI->>UI: Animate Path
+    UI->>UI: Show Prize at Goal
 ```
