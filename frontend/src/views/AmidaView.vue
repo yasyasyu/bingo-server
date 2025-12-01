@@ -5,11 +5,12 @@ import { useAmida } from '../composables/useAmida'
 
 const router = useRouter()
 const route = useRoute()
-const { items, isConfigured, isLoading, fetchAmida, setupAmida } = useAmida()
+const { items, isConfigured, isLoading, fetchAmida, setupAmida, fetchResults } = useAmida()
 
 // Setup Mode State
 const inputItems = ref<string[]>(new Array(10).fill(''))
 const revealedIndices = ref<Set<number>>(new Set())
+const bottomPrizes = ref<string[]>(new Array(10).fill('???'))
 
 // Game Mode State
 const canvasRef = ref<HTMLCanvasElement | null>(null)
@@ -27,6 +28,7 @@ onMounted(async () => {
     inputItems.value = [...items.value]
     if (route.path === '/amida/result') {
       generateAmida()
+      await calculateResults()
       await nextTick()
       drawAmida()
     }
@@ -44,17 +46,58 @@ watch(() => route.path, async (newPath) => {
     if (horizontalLines.value.length === 0) {
       generateAmida()
     }
+    await calculateResults()
     await nextTick()
     drawAmida()
   }
 })
 
-const handleSubmit = async () => {
+const saveInput = async () => {
   await setupAmida(inputItems.value)
-  router.push('/amida/result')
-  generateAmida()
-  await nextTick()
-  drawAmida()
+}
+
+const handleSubmit = async () => {
+  await saveInput()
+  const results = await fetchResults()
+  if (results && results.length > 0) {
+    router.push('/amida/result')
+  } else {
+    alert("Please enter all items before starting.")
+  }
+}
+
+const calculateResults = async () => {
+  const results = await fetchResults()
+  if (!results) return
+
+  // Create a map of Guest -> Prize
+  const prizeMap = new Map<string, string>()
+  results.forEach(([guest, prize]) => {
+    prizeMap.set(guest, prize)
+  })
+
+  const newBottomPrizes = new Array(10).fill('???')
+
+  for (let i = 0; i < 10; i++) {
+    const guestName = items.value[i]
+    if (!guestName) continue
+
+    // Simulate path
+    let currentX = i
+    for (let level = 0; level < HORIZONTAL_LINES_COUNT; level++) {
+       const hLine = horizontalLines.value.find(l => l.level === level && (l.leftIndex === currentX || l.leftIndex === currentX - 1))
+       if (hLine) {
+         if (hLine.leftIndex === currentX) currentX++
+         else currentX--
+       }
+    }
+    
+    const prize = prizeMap.get(guestName)
+    if (prize) {
+        newBottomPrizes[currentX] = prize
+    }
+  }
+  bottomPrizes.value = newBottomPrizes
 }
 
 const generateAmida = () => {
@@ -252,7 +295,7 @@ const clearResult = () => {
       <div class="inputs-grid">
         <div v-for="(_item, index) in inputItems" :key="index" class="input-group">
           <label>{{ index + 1 }}</label>
-          <input v-model="inputItems[index]" placeholder="Item name..." />
+          <input v-model="inputItems[index]" placeholder="Item name..." @blur="saveInput" />
         </div>
       </div>
       <button @click="handleSubmit" :disabled="isLoading" class="start-btn">
@@ -279,7 +322,7 @@ const clearResult = () => {
 
       <div class="results-row">
         <div v-for="i in 10" :key="i" class="result-item" :class="{ highlight: resultIndex === i-1 }">
-          {{ revealedIndices.has(i-1) ? i : '???' }}
+          {{ revealedIndices.has(i-1) ? bottomPrizes[i-1] : '???' }}
         </div>
       </div>
 

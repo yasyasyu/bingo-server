@@ -39,7 +39,7 @@ export function useAmida() {
     const setupAmida = async (newItems: string[]) => {
         isLoading.value = true
         try {
-            const res = await fetch(`${API_BASE}/amida/setup`, {
+            const res = await fetch(`${API_BASE}/amida`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -57,12 +57,28 @@ export function useAmida() {
         }
     }
 
+    const fetchResults = async () => {
+        isLoading.value = true
+        try {
+            const res = await fetch(`${API_BASE}/amida/result`)
+            if (!res.ok) throw new Error('Failed to fetch results')
+            const data: { items: [string, string][], message: string } = await res.json()
+            return data.items
+        } catch (e) {
+            error.value = e instanceof Error ? e.message : 'Unknown error'
+            return null
+        } finally {
+            isLoading.value = false
+        }
+    }
+
     return {
         items,
         isConfigured,
         isLoading,
         error,
         fetchAmida,
-        setupAmida
+        setupAmida,
+        fetchResults
     }
 }
