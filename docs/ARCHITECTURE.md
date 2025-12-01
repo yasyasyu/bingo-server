@@ -271,7 +271,7 @@ sequenceDiagram
     note over User, Domain: Phase 3: Play
     UI->>UI: generateAmida() (Random Lines)
     UI->>UI: calculatePrizes() (Map Results to Path)
-    User->>UI: Click Guest Button
+    User->>UI: Click Prize Number Button
     UI->>UI: Animate Path
-    UI->>UI: Show Prize at Goal
+    UI->>UI: Show Guest at Goal
 ```
