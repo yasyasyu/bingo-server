@@ -75,39 +75,16 @@
 
 ---
 
-### 3. あみだくじデータ取得 (Get Amida)
+### 3. あみだくじ設定 (Set Amida)
 
-現在のあみだくじの設定（景品名）を取得します。
+あみだくじの参加者（ゲスト）名を設定します。
 
 *   **URL**: `/amida`
-*   **Method**: `GET`
-
-#### レスポンス
-
-```json
-{
-  "items": ["Prize A", "Prize B", ...],
-  "message": "Success"
-}
-```
-
-| フィールド | 型 | 説明 |
-| :--- | :--- | :--- |
-| `items` | `array<string>` | 設定された10個の景品名のリスト。未設定の場合は空文字が含まれる。 |
-| `message` | `string` | "Success" |
-
----
-
-### 4. あみだくじ設定 (Setup Amida)
-
-あみだくじの景品名を設定します。
-
-*   **URL**: `/amida/setup`
 *   **Method**: `POST`
 *   **Body**:
     ```json
     {
-      "items": ["Prize A", "Prize B", ...]
+      "items": ["Guest A", "Guest B", ...]
     }
     ```
 
@@ -115,12 +92,39 @@
 
 ```json
 {
-  "items": ["Prize A", "Prize B", ...],
+  "items": ["Guest A", "Guest B", ...],
   "message": "Updated"
 }
 ```
 
 | フィールド | 型 | 説明 |
 | :--- | :--- | :--- |
-| `items` | `array<string>` | 更新後の景品名リスト。 |
+| `items` | `array<string>` | 更新後の参加者名リスト。 |
 | `message` | `string` | "Updated" |
+
+---
+
+### 4. あみだくじ結果取得 (Get Amida Result)
+
+あみだくじの結果（参加者と景品番号のペア）を取得します。
+
+*   **URL**: `/amida/result`
+*   **Method**: `GET`
+
+#### レスポンス
+
+```json
+{
+  "items": [
+    ["Guest A", "3"],
+    ["Guest B", "1"],
+    ...
+  ],
+  "message": "Success"
+}
+```
+
+| フィールド | 型 | 説明 |
+| :--- | :--- | :--- |
+| `items` | `array<array<string>>` | `[参加者名, 景品番号]` のペアのリスト。 |
+| `message` | `string` | "Success" |

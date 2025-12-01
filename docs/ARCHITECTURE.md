@@ -41,10 +41,11 @@ classDiagram
         +new() Self
     }
 
-    class BingoRng {
+    class IRng {
         <<Trait>>
         +next_u32() u32
         +shuffle(slice: &mut [u8])
+        +shift(shift: usize)
     }
 
     class XorShift {
@@ -52,24 +53,34 @@ classDiagram
         +new(seed: u32) Self
         +next_u32() u32
         +shuffle(slice: &mut [u8])
+        +shift(shift: usize)
     }
 
     class BingoGame {
         +Vec~u8~ remaining_numbers
         +Vec~u8~ history
-        -Box~dyn BingoRng~ rng
-        +new(rng: Box~dyn BingoRng~) Self
+        -Box~dyn IRng~ rng
+        +new(count: usize, rng: Box~dyn IRng~) Self
         -shuffle()
-        +draw_number() Option~u8~
+        +get_next_number() Option~u8~
         +reset()
+    }
+
+    class AmidaGame {
+        +Vec~String~ gests
+        +Vec~u8~ items
+        -Box~dyn IRng~ rng
+        +new(count: usize, rng: Box~dyn IRng~) Self
+        +update(gests: Vec~String~)
+        +get_result() Option~Vec~tuple~~
     }
 
     class Handlers {
         <<Module>>
-        +next_number(State) Json
+        +get_next_number(State) Json
         +reset_game(State) Json
-        +get_amida(State) Json
-        +setup_amida(State) Json
+        +set_amida(State) Json
+        +get_amida_result(State) Json
     }
     
     class NumberResponse {
@@ -86,13 +97,21 @@ classDiagram
         +String message
     }
 
+    class AmidaResultResponse {
+        <<Struct>>
+        +Vec~tuple~ items
+        +String message
+    }
+
     Handlers ..> AppState : Uses via Axum State
     Handlers ..> NumberResponse : Returns
     Handlers ..> AmidaResponse : Returns
+    Handlers ..> AmidaResultResponse : Returns
     AppState o-- BingoGame : Contains (Thread Safe)
     AppState o-- AmidaGame : Contains (Thread Safe)
-    BingoGame o-- BingoRng : Depends on (DI)
-    XorShift ..|> BingoRng : Implements
+    BingoGame o-- IRng : Depends on (DI)
+    AmidaGame o-- IRng : Depends on (DI)
+    XorShift ..|> IRng : Implements
 ```
 
 ## 3. フロントエンド詳細設計 (クラス図)
@@ -231,4 +250,38 @@ sequenceDiagram
         Logic->>Audio: playWin()
         Logic->>Logic: isSpinning = false
     end
+```
+
+## 5. あみだくじ処理フロー (シーケンス図)
+
+あみだくじの設定から結果取得までのフローです。
+結果（誰がどの番号になるか）はサーバーサイドで決定されます。
+
+```mermaid
+sequenceDiagram
+    title Amidakuji Setup & Play Flow
+    actor User
+    participant UI as AmidaView
+    participant Logic as useAmida
+    participant Server as Backend Handler
+    participant Domain as AmidaGame
+
+    note over User, Domain: Phase 1: Setup
+    User->>UI: Input Names & Click "Start"
+    UI->>Logic: setupAmida(names)
+    Logic->>Server: POST /amida
+    Server->>Domain: update(names)
+    Domain-->>Server: ok
+    Server-->>Logic: { items: [...], message: "Updated" }
+    Logic->>UI: Navigate to Game View
+
+    note over User, Domain: Phase 2: Play (Result)
+    User->>UI: Click Guest Button
+    UI->>Logic: Request Result
+    Logic->>Server: GET /amida/result
+    Server->>Domain: get_result()
+    note right of Domain: Pair guests with<br/>shuffled numbers
+    Domain-->>Server: [(GuestA, 3), (GuestB, 1)...]
+    Server-->>Logic: { items: [...], message: "Success" }
+    Logic->>UI: Animate & Show Result
 ```
