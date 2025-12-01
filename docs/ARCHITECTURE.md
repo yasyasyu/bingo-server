@@ -41,10 +41,24 @@ classDiagram
         +new() Self
     }
 
+    class BingoRng {
+        <<Trait>>
+        +next_u32() u32
+        +shuffle(slice: &mut [u8])
+    }
+
+    class XorShift {
+        -u32 state
+        +new(seed: u32) Self
+        +next_u32() u32
+        +shuffle(slice: &mut [u8])
+    }
+
     class BingoGame {
         +Vec~u8~ remaining_numbers
         +Vec~u8~ history
-        +new() Self
+        -Box~dyn BingoRng~ rng
+        +new(rng: Box~dyn BingoRng~) Self
         -shuffle()
         +draw_number() Option~u8~
         +reset()
@@ -61,11 +75,14 @@ classDiagram
         +Option~u8~ number
         +Vec~u8~ history
         +String message
+        +u32 seed
     }
 
     Handlers ..> AppState : Uses via Axum State
     Handlers ..> NumberResponse : Returns
     AppState o-- BingoGame : Contains (Thread Safe)
+    BingoGame o-- BingoRng : Depends on (DI)
+    XorShift ..|> BingoRng : Implements
 ```
 
 ## 3. フロントエンド詳細設計 (クラス図)
