@@ -8,12 +8,12 @@ import AmidaBoard from '../components/AmidaBoard.vue'
 
 const router = useRouter()
 const route = useRoute()
-const { items, isConfigured, isLoading, fetchAmida, setupAmida, fetchResults } = useAmida()
+const { items, isConfigured, isLoading, seed, fetchAmida, setupAmida, fetchResults } = useAmida()
 const { 
-  horizontalLines, 
-  bottomPrizes, 
-  generateAmida, 
-  calculatePrizes 
+    horizontalLines, 
+    bottomPrizes,
+    generateAmida, 
+    calculatePrizes 
 } = useAmidaGame()
 
 // Setup Mode State
@@ -93,6 +93,8 @@ const resetView = () => {
       :bottom-prizes="bottomPrizes"
       @edit="resetView"
     />
+
+    <div v-if="seed" class="seed-display">Seed: {{ seed }}</div>
   </div>
 </template>
 

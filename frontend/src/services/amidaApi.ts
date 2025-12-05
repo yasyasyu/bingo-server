@@ -3,11 +3,13 @@ const API_BASE = 'http://localhost:3000'
 export interface AmidaResponse {
     items: string[]
     message: string
+    seed: number
 }
 
 export interface AmidaResultResponse {
     items: [string, string][]
     message: string
+    seed: number
 }
 
 /**

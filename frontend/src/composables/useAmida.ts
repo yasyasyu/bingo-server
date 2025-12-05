@@ -6,6 +6,7 @@ const items = ref<string[]>(new Array(10).fill(''))
 const isConfigured = ref(false)
 const isLoading = ref(false)
 const error = ref<string | null>(null)
+const seed = ref<number | null>(null)
 
 export function useAmida() {
     const fetchAmida = async () => {
@@ -21,6 +22,7 @@ export function useAmida() {
             } else {
                 isConfigured.value = false
             }
+            seed.value = data.seed
         } catch (e) {
             error.value = e instanceof Error ? e.message : 'Unknown error'
         } finally {
@@ -59,6 +61,7 @@ export function useAmida() {
         isConfigured,
         isLoading,
         error,
+        seed,
         fetchAmida,
         setupAmida,
         fetchResults

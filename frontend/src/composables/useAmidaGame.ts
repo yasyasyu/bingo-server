@@ -55,7 +55,7 @@ export function useAmidaGame() {
         // Prize -> Guest のマップを作成
         // 例: "1" -> "Guest A"
         const prizeMap = new Map<string, string>()
-        results.forEach(([guest, prize]) => {
+        results.forEach(([prize, guest]) => {
             prizeMap.set(prize, guest)
         })
 
