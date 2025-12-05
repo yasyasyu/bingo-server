@@ -64,7 +64,7 @@ impl AmidaGame {
 
         let mut result = Vec::new();
         for (gest, prize) in self.gests.iter().zip(self.prizes.iter()) {
-            result.push((gest.clone(), prize.to_string()));
+            result.push((prize.to_string(), gest.clone()));
         }
 
         Some(result)

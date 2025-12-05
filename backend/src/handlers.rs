@@ -29,6 +29,8 @@ pub struct AmidaResponse {
     pub items: Vec<String>,
     /// ステータスメッセージ
     pub message: String,
+    /// 使用されているシード値
+    pub seed: u32,
 }
 
 /// あみだくじ結果レスポンス
@@ -38,6 +40,8 @@ pub struct AmidaResultResponse {
     pub items: Vec<(String, String)>,
     /// ステータスメッセージ
     pub message: String,
+    /// 使用されているシード値
+    pub seed: u32,
 }
 
 /// 次のビンゴ番号を抽選する
@@ -100,6 +104,7 @@ pub async fn get_amida(State(state): State<AppState>) -> Json<AmidaResponse> {
     Json(AmidaResponse {
         items: amida.gests.clone(),
         message: "Success".to_string(),
+        seed: state.seed,
     })
 }
 
@@ -122,6 +127,7 @@ pub async fn set_amida(
     Json(AmidaResponse {
         items: amida.gests.clone(),
         message: "Updated".to_string(),
+        seed: state.seed,
     })
 }
 
@@ -143,5 +149,6 @@ pub async fn get_amida_result(State(state): State<AppState>) -> Json<AmidaResult
     Json(AmidaResultResponse {
         items: result.unwrap_or_default(),
         message: "Success".to_string(),
+        seed: state.seed,
     })
 }
