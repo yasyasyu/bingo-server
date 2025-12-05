@@ -15,6 +15,9 @@ use std::io::{self, BufRead};
 use std::path::Path;
 use tower_http::cors::{Any, CorsLayer};
 
+
+const SEEDS_FILE_PATH:&str = "seeds.txt";
+
 /// シードファイルを読み込んでシード値を計算する
 ///
 /// `seeds.txt` ファイルから数値を読み込み、それらを掛け合わせてシード値を生成します。
@@ -40,7 +43,7 @@ fn calculate_seed_from_file(path: &str) -> u32 {
         }
     };
 
-    let mut seed: u32 = 0;
+    let mut seed: u32 = 1;
     for line in io::BufReader::new(file).lines() {
         if let Ok(line) = line {
             if let Ok(num) = line.trim().parse::<u32>() {
@@ -59,7 +62,7 @@ async fn main() {
     // シードの計算
     // seeds.txt から数値を読み込み、それらを掛け合わせてシード値を生成します。
     // これにより、外部からシード値を制御し、再現性を確保します。
-    let seed = calculate_seed_from_file("seeds.txt");
+    let seed = calculate_seed_from_file(SEEDS_FILE_PATH);
 
     // 初期状態の作成
     // アプリケーション全体で共有される状態（ビンゴ、あみだくじ）を初期化します。

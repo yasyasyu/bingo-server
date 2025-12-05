@@ -43,6 +43,8 @@ impl XorShift {
             initial_state: if seed != 0 { seed } else { DEFAULT_SEED },
             state: 0,
         };
+        println!("current XorShift seed:{}", &rng.initial_state);
+
         rng.reset();
         rng
     }
@@ -88,6 +90,8 @@ impl MersenneTwister {
             mt: [0; 624],
             index: 624,
         };
+        println!("current MersenneTwister seed:{}", &seed);
+
         rng.initialize(seed);
         rng
     }
