@@ -1,5 +1,5 @@
 use crate::domain::{AmidaGame, BingoGame};
-use crate::rng::XorShift;
+use crate::rng::{MersenneTwister, XorShift};
 use std::sync::{Arc, Mutex};
 
 const BINGO_MAX_NUMBER: usize = 75;
@@ -33,7 +33,7 @@ impl AppState {
             ))),
             amida: Arc::new(Mutex::new(AmidaGame::new(
                 AMIDA_PRIZES_COUNT,
-                Box::new(XorShift::shift_new(seed, BINGO_MAX_NUMBER)),
+                Box::new(MersenneTwister::new(seed)),
             ))),
             seed,
         }
