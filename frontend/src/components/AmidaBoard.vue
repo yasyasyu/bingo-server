@@ -8,10 +8,12 @@ const props = defineProps<{
 }>()
 
 const canvasRef = ref<HTMLCanvasElement | null>(null)
-const selectedStart = ref<number | null>(null)
+const activeStartIndices = ref<Set<number>>(new Set())
 const isAnimating = ref(false)
-const resultIndex = ref<number | null>(null)
+const lastResultIndices = ref<Set<number>>(new Set())
 const revealedIndices = ref<Set<number>>(new Set())
+const resultMap = ref<Map<number, number>>(new Map())
+const usedStartIndices = ref<Set<number>>(new Set())
 
 const HORIZONTAL_LINES_COUNT = 15
 
@@ -32,7 +34,7 @@ const drawAmida = () => {
 
     // Draw Vertical Lines
     ctx.strokeStyle = 'white'
-    ctx.lineWidth = 3
+    ctx.lineWidth = 14
     ctx.lineCap = 'round'
 
     for (let i = 0; i < 10; i++) {
@@ -56,17 +58,9 @@ const drawAmida = () => {
     }
 }
 
-const startAnimation = async (startIndex: number) => {
-    if (isAnimating.value) return
-    selectedStart.value = startIndex
-    isAnimating.value = true
-    resultIndex.value = null
-
+const animateSinglePath = async (ctx: CanvasRenderingContext2D, startIndex: number, color: string, offset: number, lineWidth: number): Promise<number | null> => {
     const canvas = canvasRef.value
-    if (!canvas) return
-    const ctx = canvas.getContext('2d')
-    if (!ctx) return
-
+    if (!canvas) return null
     const width = canvas.width
     const height = canvas.height
     const lineSpacing = width / 11
@@ -77,18 +71,15 @@ const startAnimation = async (startIndex: number) => {
     let currentXIndex = startIndex
     let currentY = startY
 
-    // Animation Loop
-    ctx.strokeStyle = '#ff0000' // Red for active path
-    ctx.lineWidth = 5
-
     for (let level = 0; level < HORIZONTAL_LINES_COUNT; level++) {
         const nextY = startY + (level + 1) * levelHeight
         const midY = startY + (level + 0.5) * levelHeight
 
         // 1. Go down to mid of level
         await animateLine(ctx,
-            lineSpacing * (currentXIndex + 1), currentY,
-            lineSpacing * (currentXIndex + 1), midY
+            lineSpacing * (currentXIndex + 1) + offset, currentY + offset,
+            lineSpacing * (currentXIndex + 1) + offset, midY + offset,
+            color, lineWidth
         )
         currentY = midY
 
@@ -99,34 +90,82 @@ const startAnimation = async (startIndex: number) => {
             // Cross over
             const targetXIndex = hLine.leftIndex === currentXIndex ? currentXIndex + 1 : currentXIndex - 1
             await animateLine(ctx,
-                lineSpacing * (currentXIndex + 1), currentY,
-                lineSpacing * (targetXIndex + 1), currentY
+                lineSpacing * (currentXIndex + 1) + offset, currentY + offset,
+                lineSpacing * (targetXIndex + 1) + offset, currentY + offset,
+                color, lineWidth
             )
             currentXIndex = targetXIndex
         }
 
         // 3. Go down to bottom of level
         await animateLine(ctx,
-            lineSpacing * (currentXIndex + 1), currentY,
-            lineSpacing * (currentXIndex + 1), nextY
+            lineSpacing * (currentXIndex + 1) + offset, currentY + offset,
+            lineSpacing * (currentXIndex + 1) + offset, nextY + offset,
+            color, lineWidth
         )
         currentY = nextY
     }
 
     // Final segment to bottom
     await animateLine(ctx,
-        lineSpacing * (currentXIndex + 1), currentY,
-        lineSpacing * (currentXIndex + 1), endY
+        lineSpacing * (currentXIndex + 1) + offset, currentY + offset,
+        lineSpacing * (currentXIndex + 1) + offset, endY + offset,
+        color, lineWidth
     )
 
-    resultIndex.value = currentXIndex
-    if (currentXIndex !== null) {
-        revealedIndices.value.add(currentXIndex)
+    return currentXIndex
+}
+
+const startAnimation = async (startIndex: number) => {
+    if (isAnimating.value || usedStartIndices.value.has(startIndex)) return
+
+    const remaining = []
+    for (let i = 0; i < 10; i++) {
+        if (!usedStartIndices.value.has(i)) remaining.push(i)
     }
+
+    const targets: number[] = []
+    if (remaining.length === 2 && remaining.includes(startIndex)) {
+        targets.push(...remaining)
+    } else {
+        targets.push(startIndex)
+    }
+
+    drawAmida()
+    activeStartIndices.value.clear()
+    targets.forEach(t => activeStartIndices.value.add(t))
+    isAnimating.value = true
+    lastResultIndices.value.clear()
+
+    const canvas = canvasRef.value
+    if (!canvas) return
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+
+    // Animation Loop
+    // Colors: If 2 targets (last 2), use Red and Blue. Otherwise Red.
+    const isDual = targets.length === 2
+    const colors = isDual ? ['#ff0000', '#0088ff'] : ['#ff0000']
+    const offsets = isDual ? [-3, 3] : [0]
+    const lineWidths = isDual ? [6, 6] : [8]
+
+    const promises = targets.map((idx, i) => animateSinglePath(ctx, idx, colors[i] || '#ff0000', offsets[i] || 0, lineWidths[i] || 5))
+    const results = await Promise.all(promises)
+
+    results.forEach((resIdx, i) => {
+        const startIdx = targets[i]
+        if (resIdx !== null && startIdx !== undefined) {
+            revealedIndices.value.add(resIdx)
+            resultMap.value.set(resIdx, startIdx)
+            lastResultIndices.value.add(resIdx)
+            usedStartIndices.value.add(startIdx)
+        }
+    })
+
     isAnimating.value = false
 }
 
-const animateLine = (ctx: CanvasRenderingContext2D, x1: number, y1: number, x2: number, y2: number): Promise<void> => {
+const animateLine = (ctx: CanvasRenderingContext2D, x1: number, y1: number, x2: number, y2: number, color: string, lineWidth: number): Promise<void> => {
     return new Promise(resolve => {
         const duration = 100 // ms per segment
         const startTime = performance.now()
@@ -138,6 +177,8 @@ const animateLine = (ctx: CanvasRenderingContext2D, x1: number, y1: number, x2: 
             const currentX = x1 + (x2 - x1) * progress
             const currentY = y1 + (y2 - y1) * progress
 
+            ctx.strokeStyle = color
+            ctx.lineWidth = lineWidth
             ctx.beginPath()
             ctx.moveTo(x1, y1)
             ctx.lineTo(currentX, currentY)
@@ -152,10 +193,12 @@ const animateLine = (ctx: CanvasRenderingContext2D, x1: number, y1: number, x2: 
         requestAnimationFrame(animate)
     })
 }
-
 const clearResult = () => {
-    resultIndex.value = null
-    selectedStart.value = null
+    lastResultIndices.value.clear()
+    activeStartIndices.value.clear()
+    revealedIndices.value.clear()
+    resultMap.value.clear()
+    usedStartIndices.value.clear()
     drawAmida()
 }
 
@@ -172,8 +215,10 @@ const getLabel = (index: number) => `No${index + 1}`
 <template>
     <div class="game-panel">
         <div class="start-buttons">
-            <button v-for="i in 10" :key="i" @click="startAnimation(i - 1)" :disabled="isAnimating" class="choice-btn"
-                :class="{ active: selectedStart === i - 1 }" :style="{ left: `${(i) * (100 / 11)}%` }">
+            <button v-for="i in 10" :key="i" @click="startAnimation(i - 1)"
+                :disabled="isAnimating || usedStartIndices.has(i - 1)" class="choice-btn"
+                :class="{ active: activeStartIndices.has(i - 1), used: usedStartIndices.has(i - 1) }"
+                :style="{ left: `${(i) * (100 / 11)}%` }">
                 {{ getLabel(i - 1) }}
             </button>
         </div>
@@ -181,9 +226,12 @@ const getLabel = (index: number) => `No${index + 1}`
         <canvas ref="canvasRef" width="1200" height="700" class="amida-canvas"></canvas>
 
         <div class="results-row">
-            <div v-for="i in 10" :key="i" class="result-item" :class="{ highlight: resultIndex === i - 1 }"
+            <div v-for="i in 10" :key="i" class="result-item" :class="{ highlight: lastResultIndices.has(i - 1) }"
                 :style="{ left: `${(i) * (100 / 11)}%` }">
-                {{ revealedIndices.has(i - 1) ? bottomPrizes[i - 1] : '???' }}
+                <div class="guest-name">{{ revealedIndices.has(i - 1) ? bottomPrizes[i - 1] : '???' }}</div>
+                <div v-if="resultMap.has(i - 1)" class="prize-number">
+                    {{ getLabel(resultMap.get(i - 1)!) }}
+                </div>
             </div>
         </div>
 
@@ -243,6 +291,13 @@ const getLabel = (index: number) => `No${index + 1}`
     background: transparent;
     border-color: transparent;
     transform: translateX(-50%) scale(1.3);
+}
+
+.choice-btn.used {
+    color: white;
+    opacity: 0.8;
+    transform: translateX(-50%) scale(1);
+    text-shadow: none;
 }
 
 .amida-canvas {
@@ -309,5 +364,16 @@ const getLabel = (index: number) => `No${index + 1}`
 .control-btn:disabled {
     opacity: 0.6;
     cursor: not-allowed;
+}
+
+.prize-number {
+    font-size: 0.8rem;
+    color: #d4af37;
+    margin-top: 2px;
+    font-weight: bold;
+}
+
+.result-item.highlight .prize-number {
+    color: #1a472a;
 }
 </style>
