@@ -19,7 +19,6 @@ defineProps<{
     padding: 20px;
     border-radius: 15px;
     width: 80%;
-    /* max-width: 1800px; */
     min-height: 140px;
 }
 

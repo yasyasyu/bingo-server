@@ -1,18 +1,25 @@
 <script setup lang="ts">
-defineProps<{
+const props = defineProps<{
     displayText: string | number
     currentNumber: number | null
     isSpinning: boolean
 }>()
+
 defineEmits<{
     (e: 'spin'): void
 }>()
+
+const isNumber = () => typeof props.displayText === 'number'
+const shouldAnimate = () => !props.isSpinning && props.currentNumber !== null
 </script>
 
 <template>
     <button class="display-area" @click="$emit('spin')" :disabled="isSpinning">
-        <div
-            :class="[{ 'number-display': typeof displayText === 'number', 'text-display': typeof displayText === 'string' }, { pop: !isSpinning && currentNumber }]">
+        <div :class="{
+            'number-display': isNumber(),
+            'text-display': !isNumber(),
+            'pop': shouldAnimate()
+        }">
             {{ displayText }}
         </div>
     </button>

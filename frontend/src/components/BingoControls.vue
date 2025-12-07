@@ -10,9 +10,6 @@ defineEmits<{
 
 <template>
     <div class="controls">
-        <!-- <button @click="$emit('spin')" :disabled="isSpinning" class="spin-btn">
-      {{ isSpinning ? 'Spinning...' : 'SPIN' }}
-    </button> -->
         <button @click="$emit('reset')" :disabled="isSpinning" class="reset-btn">
             RESET
         </button>
