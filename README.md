@@ -5,14 +5,21 @@ Rust (Axum) による堅牢なバックエンドと、Vue.js によるインタ�
 
 ## 📚 ドキュメント
 
-詳細な仕様や設計については `docs/` ディレクトリ内のドキュメントを参照してください。
+プロジェクトの詳細な情報は `docs/` ディレクトリに集約されています。
 
-- [仕様書 (Specification)](docs/SPECIFICATION.md): 機能要件、システム概要
-- [API仕様書 (API Spec)](docs/API_SPEC.md): バックエンドAPIのエンドポイント定義
-- [アーキテクチャ設計書 (Architecture)](docs/ARCHITECTURE.md): UML図を用いた設計図
-- [ディレクトリ構造 (Directory Structure)](docs/DIRECTORY_STRUCTURE.md): ファイル構成と責務の詳細
+| ドキュメント | 説明 | 対象読者 |
+| :--- | :--- | :--- |
+| [📄 仕様書 (Specification)](docs/SPECIFICATION.md) | システムの機能要件、画面構成、全体概要。 | 全員 |
+| [📖 操作マニュアル (User Manual)](docs/USER_MANUAL.md) | 当日のオペレーター・司会者向けの操作手順書。 | 利用者 |
+| [🏗️ アーキテクチャ設計書 (Architecture)](docs/ARCHITECTURE.md) | クラス図、シーケンス図を用いた内部設計の詳細。 | 開発者 |
+| [🔌 API仕様書 (API Spec)](docs/API_SPEC.md) | バックエンドAPIのエンドポイント定義と使用例。 | 開発者 |
+| [📂 ディレクトリ構造 (Directory Structure)](docs/DIRECTORY_STRUCTURE.md) | ファイル構成と各モジュールの責務解説。 | 開発者 |
+| [🚀 デプロイメントガイド (Deployment)](docs/DEPLOYMENT.md) | 実行ファイルのビルドと、本番環境への配置手順。 | インフラ/運用 |
 
-## 🚀 クイックスタート
+## 🚀 クイックスタート (開発者向け)
+
+開発環境（Rust, Node.js）が整っている場合の起動手順です。
+実行ファイルのみでの起動方法は [デプロイメントガイド](docs/DEPLOYMENT.md) を参照してください。
 
 ### 前提条件
 - **Rust**: 最新の安定版 (cargo)
