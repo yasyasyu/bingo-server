@@ -40,6 +40,12 @@
 | `message` | `string` | 状態を表すメッセージ。 |
 | `seed` | `integer` | 現在の乱数生成に使用されているシード値。 |
 
+#### 実行例 (curl)
+
+```bash
+curl -X GET http://localhost:3000/next_number
+```
+
 ---
 
 ### 2. ゲームリセット (Reset Game)
@@ -67,6 +73,12 @@
 | `message` | `string` | "Game Reset" |
 | `seed` | `integer` | 現在の乱数生成に使用されているシード値。 |
 
+#### 実行例 (curl)
+
+```bash
+curl -X POST http://localhost:3000/reset
+```
+
 ## エラーハンドリング
 サーバー内部エラーが発生した場合、標準的なHTTPステータスコード `500 Internal Server Error` が返される可能性があります。クライアント側では通信エラーとしてハンドリングすることを推奨します。
 
@@ -87,7 +99,8 @@
 ```json
 {
   "items": ["Guest A", "Guest B", ...],
-  "message": "Success"
+  "message": "Success",
+  "seed": 123456789
 }
 ```
 
@@ -95,28 +108,42 @@
 | :--- | :--- | :--- |
 | `items` | `array<string>` | 現在設定されている参加者名リスト。未設定の箇所は空文字が含まれる場合がある。 |
 | `message` | `string` | "Success" |
+| `seed` | `integer` | 現在の乱数生成に使用されているシード値。 |
+
+#### 実行例 (curl)
+
+```bash
+curl -X GET http://localhost:3000/amida
+```
 
 ---
 
-### 4. あみだくじ設定 (Set Amida)
+### 4. あみだくじ設定更新 (Set Amida)
 
-あみだくじの参加者（ゲスト）名を設定します。
+あみだくじの参加者（ゲスト）名リストを更新します。
 
 *   **URL**: `/amida`
 *   **Method**: `POST`
-*   **Body**:
-    ```json
-    {
-      "items": ["Guest A", "Guest B", ...]
-    }
-    ```
+
+#### リクエスト
+
+```json
+{
+  "items": ["Guest A", "Guest B", ...]
+}
+```
+
+| フィールド | 型 | 説明 |
+| :--- | :--- | :--- |
+| `items` | `array<string>` | 設定する参加者名リスト（10名分）。 |
 
 #### レスポンス
 
 ```json
 {
   "items": ["Guest A", "Guest B", ...],
-  "message": "Updated"
+  "message": "Updated",
+  "seed": 123456789
 }
 ```
 
@@ -124,12 +151,22 @@
 | :--- | :--- | :--- |
 | `items` | `array<string>` | 更新後の参加者名リスト。 |
 | `message` | `string` | "Updated" |
+| `seed` | `integer` | 現在の乱数生成に使用されているシード値。 |
+
+#### 実行例 (curl)
+
+```bash
+curl -X POST http://localhost:3000/amida \
+  -H "Content-Type: application/json" \
+  -d '{"items": ["Alice", "Bob", "Charlie", "Dave", "Eve", "Frank", "Grace", "Heidi", "Ivan", "Judy"]}'
+```
 
 ---
 
 ### 5. あみだくじ結果取得 (Get Amida Result)
 
-あみだくじの結果（参加者と番号のペア）を取得します。
+あみだくじの抽選結果（誰がどの番号に当たったか）を取得します。
+結果はサーバーサイドのシード値に基づいて決定されます。
 
 *   **URL**: `/amida/result`
 *   **Method**: `GET`
@@ -139,15 +176,24 @@
 ```json
 {
   "items": [
-    ["Guest A", "3"],
-    ["Guest B", "1"],
+    ["Guest A", "1"],
+    ["Guest B", "5"],
     ...
   ],
-  "message": "Success"
+  "message": "Success",
+  "seed": 123456789
 }
 ```
 
 | フィールド | 型 | 説明 |
 | :--- | :--- | :--- |
-| `items` | `array<array<string>>` | `[参加者名, 景品番号]` のペアのリスト。 |
+| `items` | `array<[string, string]>` | (参加者名, 景品番号) のペアのリスト。 |
 | `message` | `string` | "Success" |
+| `seed` | `integer` | 現在の乱数生成に使用されているシード値。 |
+
+#### 実行例 (curl)
+
+```bash
+curl -X GET http://localhost:3000/amida/result
+```
+

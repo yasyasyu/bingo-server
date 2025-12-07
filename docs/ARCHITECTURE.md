@@ -38,25 +38,37 @@ classDiagram
 
     class AppState {
         +Arc~Mutex~BingoGame~~ game
-        +new() Self
+        +Arc~Mutex~AmidaGame~~ amida
+        +u32 seed
+        +new(seed: u32) Self
     }
 
     class IRng {
         <<Trait>>
-        +next_u32() u32
+        +next() u32
         +shuffle(slice: &mut [u8])
-        +shift(shift: usize)
+        +reset()
     }
 
     class XorShift {
+        -u32 initial_state
         -u32 state
         +new(seed: u32) Self
-        +next_u32() u32
-        +shuffle(slice: &mut [u8])
-        +shift(shift: usize)
+        +next() u32
+        +reset()
+    }
+
+    class MersenneTwister {
+        -u32 initial_seed
+        -u32[624] mt
+        -usize index
+        +new(seed: u32) Self
+        +next() u32
+        +reset()
     }
 
     class BingoGame {
+        -usize count
         +Vec~u8~ remaining_numbers
         +Vec~u8~ history
         -Box~dyn IRng~ rng
@@ -67,10 +79,12 @@ classDiagram
     }
 
     class AmidaGame {
+        -usize count
         +Vec~String~ gests
         +Vec~u8~ prizes
         -Box~dyn IRng~ rng
         +new(count: usize, rng: Box~dyn IRng~) Self
+        -shuffle()
         +update(gests: Vec~String~)
         +get_result() Option~Vec~tuple~~
     }
@@ -96,12 +110,14 @@ classDiagram
         <<Struct>>
         +Vec~String~ items
         +String message
+        +u32 seed
     }
 
     class AmidaResultResponse {
         <<Struct>>
         +Vec~tuple~ items
         +String message
+        +u32 seed
     }
 
     Handlers ..> AppState : Uses via Axum State
@@ -113,9 +129,39 @@ classDiagram
     BingoGame o-- IRng : Depends on (DI)
     AmidaGame o-- IRng : Depends on (DI)
     XorShift ..|> IRng : Implements
+    MersenneTwister ..|> IRng : Implements
 ```
 
-## 3. フロントエンド詳細設計 (クラス図)
+## 3. バックエンド実装詳細
+
+Rustバックエンドの主要な設計判断と実装パターンについて解説します。
+
+### 3.1. 並行処理と状態管理 (Concurrency & State Management)
+
+本システムは `Axum` (Webフレームワーク) と `Tokio` (非同期ランタイム) 上で動作します。
+HTTPリクエストは非同期に並行処理されるため、アプリケーションの状態 (`AppState`) はスレッドセーフである必要があります。
+
+*   **`Arc<Mutex<T>>` パターン**:
+    *   `AppState` は `Arc` (Atomic Reference Counting) でラップされ、複数のスレッド（リクエストハンドラ）間で共有されます。
+    *   内部の可変な状態 (`BingoGame`, `AmidaGame`) は `Mutex` で保護されています。
+    *   ハンドラ内で `state.game.lock().unwrap()` を呼び出すことで、一時的に排他ロックを取得し、安全に状態を更新します。
+
+### 3.2. 依存性の注入 (Dependency Injection)
+
+テスト容易性と拡張性を高めるため、乱数生成器 (`IRng`) はトレイトとして定義され、ドメインロジック (`BingoGame`, `AmidaGame`) に注入されます。
+
+*   **本番環境**: `XorShift` や `MersenneTwister` などの実装を使用。
+*   **テスト環境**: 固定の値を返すモックや、特定のシードで初期化された乱数生成器を使用することで、決定論的なテストが可能になります。
+
+### 3.3. エラーハンドリング方針
+
+*   **パニック (Panic)**:
+    *   `Mutex` のロック取得失敗時 (`.lock().unwrap()`) は、スレッドが汚染されている状態（Poisoned）を意味するため、パニックさせてリクエストを失敗させます（Axumが500エラーとして処理）。
+    *   起動時の必須ファイル (`seeds.txt`) 読み込みエラーなどは、ログを出力してデフォルト値で続行するか、致命的な場合は停止します。
+*   **Result型**:
+    *   ドメインロジック内での期待されるエラー（例：あみだくじの参加者数が足りない）は `Option` や `Result` を返して呼び出し元に通知します。
+
+## 4. フロントエンド詳細設計 (クラス図)
 
 Vue.jsフロントエンドのコンポーネント構成とロジックの分離を示します。
 `App.vue` が各コンポーネントを統合し、`useBingoGame` コンポーザブルがビジネスロジックを提供します。
@@ -129,6 +175,7 @@ classDiagram
     }
     
     class Router {
+        <<Router>>
         /
         /amida
         /amida/result
@@ -142,12 +189,34 @@ classDiagram
         <<View>>
     }
 
+    class BingoDisplay {
+        <<Component>>
+    }
+
+    class BingoControls {
+        <<Component>>
+    }
+
+    class BingoHistory {
+        <<Component>>
+    }
+
     class AmidaSetup {
         <<Component>>
     }
 
     class AmidaBoard {
         <<Component>>
+    }
+
+    class useBingoGame {
+        <<Composable>>
+        +Ref~number~ currentNumber
+        +Ref~string~ displayText
+        +Ref~array~ history
+        +Ref~boolean~ isSpinning
+        +spin()
+        +resetGame()
     }
 
     class useAmida {
@@ -167,6 +236,26 @@ classDiagram
         +calculatePrizes()
     }
 
+    class useAudio {
+        <<Composable>>
+        +playBeep()
+        +playWin()
+        +resumeAudioContext()
+    }
+
+    class useDrumRoll {
+        <<Composable>>
+        +play()
+        +stop()
+        +playCymbal()
+    }
+
+    class bingoApi {
+        <<Service>>
+        +fetchNextNumber()
+        +resetGame()
+    }
+
     class amidaApi {
         <<Service>>
         +fetchSettings()
@@ -184,7 +273,8 @@ classDiagram
     AmidaView *-- AmidaSetup
     AmidaView *-- AmidaBoard
     AmidaView ..> useAmida : Uses
-    AmidaView ..> useAmidaGame : Uses
+    AmidaBoard ..> useAmidaGame : Uses
+    AmidaBoard ..> useDrumRoll : Uses
     useBingoGame ..> bingoApi : Uses
     useBingoGame ..> useAudio : Uses
     useAmida ..> amidaApi : Uses
@@ -249,8 +339,9 @@ sequenceDiagram
 sequenceDiagram
     title Amidakuji Setup & Play Flow
     actor User
-    participant UI as AmidaView
+    participant UI as AmidaBoard
     participant Logic as useAmida
+    participant Audio as useDrumRoll
     participant API as amidaApi
     participant Server as Backend Handler
     participant Domain as AmidaGame
@@ -280,6 +371,11 @@ sequenceDiagram
     UI->>UI: generateAmida() (Random Lines)
     UI->>UI: calculatePrizes() (Map Results to Path)
     User->>UI: Click Prize Number Button
-    UI->>UI: Animate Path
+    UI->>Logic: startAnimation()
+    Logic->>Audio: playDrum(isDual)
+    UI->>UI: Animate Path (Canvas)
+    Logic->>Audio: stopDrum()
+    Logic->>Audio: playCymbal()
     UI->>UI: Show Guest at Goal
+
 ```
