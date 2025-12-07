@@ -45,11 +45,6 @@ button:disabled {
     cursor: not-allowed;
 }
 
-.spin-btn {
-    background: #d4af37;
-    color: #1a472a;
-    box-shadow: 0 5px 15px rgba(212, 175, 55, 0.4);
-}
 
 .reset-btn {
     background: rgba(255, 255, 255, 0.2);

@@ -67,22 +67,18 @@ const updatePrizes = async () => {
     }
 }
 
-const resetView = () => {
-    isConfigured.value = false
-    router.push('/amida')
-}
 </script>
 
 <template>
     <div class="amida-container">
-        <h1 class="title">🎅 Amidakuji 🎅</h1>
+        <h1 class="title" v-if="route.path === '/amida'">🎅 Amidakuji 🎅</h1>
 
         <!-- Setup Mode -->
         <AmidaSetup v-if="route.path === '/amida'" v-model:items="inputItems" :is-loading="isLoading" @save="saveInput"
             @start="handleSubmit" />
 
         <!-- Game Mode -->
-        <AmidaBoard v-else :horizontal-lines="horizontalLines" :bottom-prizes="bottomPrizes" @edit="resetView" />
+        <AmidaBoard v-else :horizontal-lines="horizontalLines" :bottom-prizes="bottomPrizes" />
 
         <div v-if="seed" class="seed-display">Seed: {{ seed }}</div>
     </div>

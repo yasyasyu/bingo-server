@@ -7,10 +7,6 @@ const props = defineProps<{
     bottomPrizes: string[]
 }>()
 
-const emit = defineEmits<{
-    (e: 'edit'): void
-}>()
-
 const canvasRef = ref<HTMLCanvasElement | null>(null)
 const selectedStart = ref<number | null>(null)
 const isAnimating = ref(false)
@@ -170,28 +166,29 @@ watch(() => props.horizontalLines, () => {
 onMounted(() => {
     drawAmida()
 })
+const getLabel = (index: number) => `No${index + 1}`
 </script>
 
 <template>
     <div class="game-panel">
         <div class="start-buttons">
             <button v-for="i in 10" :key="i" @click="startAnimation(i - 1)" :disabled="isAnimating" class="choice-btn"
-                :class="{ active: selectedStart === i - 1 }">
-                {{ i }}
+                :class="{ active: selectedStart === i - 1 }" :style="{ left: `${(i) * (100 / 11)}%` }">
+                {{ getLabel(i - 1) }}
             </button>
         </div>
 
-        <canvas ref="canvasRef" width="800" height="500" class="amida-canvas"></canvas>
+        <canvas ref="canvasRef" width="1200" height="700" class="amida-canvas"></canvas>
 
         <div class="results-row">
-            <div v-for="i in 10" :key="i" class="result-item" :class="{ highlight: resultIndex === i - 1 }">
+            <div v-for="i in 10" :key="i" class="result-item" :class="{ highlight: resultIndex === i - 1 }"
+                :style="{ left: `${(i) * (100 / 11)}%` }">
                 {{ revealedIndices.has(i - 1) ? bottomPrizes[i - 1] : '???' }}
             </div>
         </div>
 
         <div class="controls">
             <button @click="clearResult" :disabled="isAnimating" class="control-btn">Clear Path</button>
-            <button @click="$emit('edit')" :disabled="isAnimating" class="control-btn danger">Edit Items</button>
         </div>
     </div>
 </template>
@@ -202,34 +199,33 @@ onMounted(() => {
     flex-direction: column;
     align-items: center;
     width: 100%;
-    max-width: 900px;
+    max-width: 1300px;
 }
 
 .start-buttons {
-    display: flex;
-    justify-content: space-between;
-    width: 800px;
-    /* Match canvas width */
-    margin-bottom: 10px;
-    padding: 0 20px;
-    /* Adjust for line spacing roughly */
+    position: relative;
+    width: 1200px;
+    height: 60px;
+    margin-bottom: 0;
 }
 
 .choice-btn {
+    position: absolute;
+    transform: translateX(-50%);
+    bottom: 0;
     min-width: 40px;
     width: 60px;
-    /* Fixed width to align with grid */
     height: auto;
     min-height: 40px;
     padding: 5px;
     border-radius: 5px;
-    border: 2px solid white;
-    background: rgba(255, 255, 255, 0.2);
-    color: white;
+    border: none;
+    background: transparent;
+    color: #d4af37;
     font-weight: bold;
     cursor: pointer;
     transition: all 0.3s;
-    font-size: 0.8rem;
+    font-size: 1.2rem;
     word-break: break-word;
     display: flex;
     align-items: center;
@@ -237,31 +233,36 @@ onMounted(() => {
 }
 
 .choice-btn:hover {
-    background: rgba(255, 255, 255, 0.5);
+    transform: translateX(-50%) scale(1.2);
+    background: transparent;
+    text-shadow: 0 0 10px rgba(212, 175, 55, 0.8);
 }
 
 .choice-btn.active {
-    background: #ff0000;
-    border-color: #ff0000;
+    color: #ff0000;
+    background: transparent;
+    border-color: transparent;
+    transform: translateX(-50%) scale(1.3);
 }
 
 .amida-canvas {
-    background: rgba(0, 0, 0, 0.3);
+    background: rgba(0, 0, 0, 0.6);
     border-radius: 10px;
     margin-bottom: 10px;
 }
 
 .results-row {
-    display: flex;
-    justify-content: space-between;
-    width: 800px;
-    padding: 0 10px;
-    /* Adjust alignment */
+    position: relative;
+    width: 1200px;
+    height: 60px;
+    margin-top: 0;
 }
 
 .result-item {
-    width: 60px;
-    /* Approx width */
+    position: absolute;
+    transform: translateX(-50%);
+    top: 0;
+    width: 80px;
     text-align: center;
     font-size: 0.9rem;
     word-break: break-word;
@@ -274,28 +275,31 @@ onMounted(() => {
     background: #d4af37;
     color: #1a472a;
     font-weight: bold;
-    transform: scale(1.1);
+    transform: translateX(-50%) scale(1.1);
 }
 
 .controls {
     display: flex;
-    gap: 10px;
-    position: absolute;
+    margin-bottom: 30px;
     bottom: 10px;
     right: 5px;
+    position: absolute;
+
 }
 
 .control-btn {
     padding: 5px 15px;
-    font-size: 0.8rem;
-    border-radius: 50px;
+    font-size: 0.8 rem;
     border: none;
+    border-radius: 50px;
     cursor: pointer;
-    background: rgba(255, 255, 255, 0.2);
-    color: white;
+    transition: transform 0.1s, box-shadow 0.1s;
     font-weight: bold;
     text-transform: uppercase;
-    transition: transform 0.1s, box-shadow 0.1s;
+
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: 2px solid white;
 }
 
 .control-btn:active {
@@ -305,13 +309,5 @@ onMounted(() => {
 .control-btn:disabled {
     opacity: 0.6;
     cursor: not-allowed;
-}
-
-.control-btn:hover:not(:disabled) {
-    background: rgba(255, 255, 255, 0.4);
-}
-
-.control-btn.danger {
-    border: 2px solid white;
 }
 </style>
