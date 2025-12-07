@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, watch, nextTick } from 'vue'
 import type { HorizontalLine } from '../composables/useAmidaGame'
+import { useDrumRoll } from '../composables/useDrumRoll'
 
 const props = defineProps<{
     horizontalLines: HorizontalLine[]
@@ -14,6 +15,8 @@ const lastResultIndices = ref<Set<number>>(new Set())
 const revealedIndices = ref<Set<number>>(new Set())
 const resultMap = ref<Map<number, number>>(new Map())
 const usedStartIndices = ref<Set<number>>(new Set())
+
+const { play: playDrum, stop: stopDrum, playCymbal } = useDrumRoll()
 
 const HORIZONTAL_LINES_COUNT = 15
 
@@ -149,8 +152,14 @@ const startAnimation = async (startIndex: number) => {
     const offsets = isDual ? [-3, 3] : [0]
     const lineWidths = isDual ? [6, 6] : [8]
 
+    playDrum(isDual)
+
     const promises = targets.map((idx, i) => animateSinglePath(ctx, idx, colors[i] || '#ff0000', offsets[i] || 0, lineWidths[i] || 5))
     const results = await Promise.all(promises)
+
+    stopDrum()
+    await new Promise(resolve => setTimeout(resolve, 500))
+    playCymbal()
 
     results.forEach((resIdx, i) => {
         const startIdx = targets[i]
