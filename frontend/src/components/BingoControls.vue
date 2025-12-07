@@ -1,15 +1,22 @@
 <script setup lang="ts">
 defineProps<{
     isSpinning: boolean
+    isSoundEnabled: boolean
 }>()
 
 defineEmits<{
     (e: 'reset'): void
+    (e: 'update:isSoundEnabled', value: boolean): void
 }>()
 </script>
 
 <template>
     <div class="controls">
+
+        <button @click="$emit('update:isSoundEnabled', !isSoundEnabled)" class="control-btn"
+            :style="{ opacity: isSoundEnabled ? 1 : 0.6 }">
+            Sound: {{ isSoundEnabled ? 'ON' : 'OFF' }}
+        </button>
         <button @click="$emit('reset')" :disabled="isSpinning" class="reset-btn">
             RESET
         </button>
@@ -19,6 +26,8 @@ defineEmits<{
 <style scoped>
 .controls {
     display: flex;
+    flex-direction: column;
+    gap: 10px;
     margin-bottom: 30px;
     bottom: 10px;
     right: 5px;
@@ -46,7 +55,8 @@ button:disabled {
 }
 
 
-.reset-btn {
+.reset-btn,
+.control-btn {
     background: rgba(255, 255, 255, 0.2);
     color: white;
     border: 2px solid white;

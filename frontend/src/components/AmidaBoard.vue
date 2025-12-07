@@ -15,8 +15,15 @@ const lastResultIndices = ref<Set<number>>(new Set())
 const revealedIndices = ref<Set<number>>(new Set())
 const resultMap = ref<Map<number, number>>(new Map())
 const usedStartIndices = ref<Set<number>>(new Set())
+const isSoundEnabled = ref(true)
 
 const { play: playDrum, stop: stopDrum, playCymbal } = useDrumRoll()
+
+watch(isSoundEnabled, (enabled) => {
+    if (!enabled) {
+        stopDrum()
+    }
+})
 
 const HORIZONTAL_LINES_COUNT = 15
 
@@ -152,14 +159,18 @@ const startAnimation = async (startIndex: number) => {
     const offsets = isDual ? [-3, 3] : [0]
     const lineWidths = isDual ? [6, 6] : [8]
 
-    playDrum(isDual)
+    if (isSoundEnabled.value) {
+        playDrum(isDual)
+    }
 
     const promises = targets.map((idx, i) => animateSinglePath(ctx, idx, colors[i] || '#ff0000', offsets[i] || 0, lineWidths[i] || 5))
     const results = await Promise.all(promises)
 
     stopDrum()
-    await new Promise(resolve => setTimeout(resolve, 500))
-    playCymbal()
+    if (isSoundEnabled.value) {
+        await new Promise(resolve => setTimeout(resolve, 500))
+        playCymbal()
+    }
 
     results.forEach((resIdx, i) => {
         const startIdx = targets[i]
@@ -245,7 +256,13 @@ const getLabel = (index: number) => `No${index + 1}`
         </div>
 
         <div class="controls">
-            <button @click="clearResult" :disabled="isAnimating" class="control-btn">Clear Path</button>
+            <button @click="isSoundEnabled = !isSoundEnabled" class="control-btn"
+                :style="{ opacity: isSoundEnabled ? 1 : 0.6 }">
+                Sound: {{ isSoundEnabled ? 'ON' : 'OFF' }}
+            </button>
+            <button @click="clearResult" :disabled="isAnimating" class="control-btn">
+                RESET
+            </button>
         </div>
     </div>
 </template>
@@ -344,6 +361,8 @@ const getLabel = (index: number) => `No${index + 1}`
 
 .controls {
     display: flex;
+    flex-direction: column;
+    gap: 10px;
     margin-bottom: 30px;
     bottom: 10px;
     right: 5px;

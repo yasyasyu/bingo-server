@@ -8,6 +8,7 @@ const displayText = ref<string | number>('Merry Christmas!')
 const history = ref<number[]>([])
 const isSpinning = ref(false)
 const seed = ref<number | null>(null)
+const isSoundEnabled = ref(true)
 
 export function useBingoGame() {
     const { playBeep, playWin, resumeAudioContext } = useAudio()
@@ -67,7 +68,9 @@ export function useBingoGame() {
                     randomNum = Math.floor(Math.random() * 75) + 1
                 } while (history.value.includes(randomNum))
                 displayText.value = randomNum
-                playBeep()
+                if (isSoundEnabled.value) {
+                    playBeep()
+                }
 
                 // イージング関数で徐々に減速（二次関数的な減速）
                 const easeOut = 1 - Math.pow(1 - progress, 2)
@@ -81,7 +84,9 @@ export function useBingoGame() {
                     currentNumber.value = targetNumber
                     history.value = data.history
                     isSpinning.value = false
-                    playWin()
+                    if (isSoundEnabled.value) {
+                        playWin()
+                    }
                 }, 150)
             }
         }
@@ -96,5 +101,6 @@ export function useBingoGame() {
         seed,
         spin,
         resetGame,
+        isSoundEnabled
     }
 }

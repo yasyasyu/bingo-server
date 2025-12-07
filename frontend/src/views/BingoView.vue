@@ -11,7 +11,8 @@ const {
     isSpinning,
     seed,
     spin,
-    resetGame
+    resetGame,
+    isSoundEnabled
 } = useBingoGame()
 </script>
 
@@ -24,7 +25,7 @@ const {
 
         <BingoHistory :history="history" />
 
-        <BingoControls :is-spinning="isSpinning" @reset="resetGame" />
+        <BingoControls :is-spinning="isSpinning" v-model:is-sound-enabled="isSoundEnabled" @reset="resetGame" />
 
         <div v-if="seed" class="seed-display">Seed: {{ seed }}</div>
     </div>

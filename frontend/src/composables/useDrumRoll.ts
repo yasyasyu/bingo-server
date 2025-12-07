@@ -65,7 +65,7 @@ export function useDrumRoll() {
         source.loop = true
 
         const gain = audioContext.value.createGain()
-        gain.gain.value = 0.8
+        gain.gain.value = isLast ? 1.5 : 0.8
 
         source.connect(gain)
         gain.connect(audioContext.value.destination)

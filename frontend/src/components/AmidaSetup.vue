@@ -34,7 +34,7 @@ const getLabel = (index: number) => String.fromCharCode(65 + index) // A, B, C, 
 <template>
     <div class="setup-panel">
         <h2>Enter Guest Names</h2>
-        <p class="description">運命のスタート地点を決めましょう！ 誰がどのプレゼントを手にするのでしょうか？</p>
+        <p class="description">誰がどのプレゼントを手にするのでしょうか？</p>
         <div class="inputs-row">
             <div v-for="(_item, index) in inputItems" :key="index" class="input-group">
                 <label>{{ getLabel(index) }}</label>
