@@ -53,31 +53,36 @@ export function useBingoGame() {
         }
 
         // ルーレット演出
-        let speed = 50
-        const duration = 3000 // 3秒
+        const duration = 5000 // 5秒
         const startTime = Date.now()
 
         const animate = () => {
             const elapsed = Date.now() - startTime
+            const progress = Math.max(0.1, elapsed) / duration
 
             if (elapsed < duration) {
-                // ランダムな数字を表示
-                displayText.value = Math.floor(Math.random() * 75) + 1
+                // ランダムな数字を表示（履歴にない数字のみ）
+                let randomNum
+                do {
+                    randomNum = Math.floor(Math.random() * 75) + 1
+                } while (history.value.includes(randomNum))
+                displayText.value = randomNum
                 playBeep()
 
-                // 徐々に遅くする
-                if (elapsed > duration * 0.7) {
-                    speed += 10
-                }
+                // イージング関数で徐々に減速（二次関数的な減速）
+                const easeOut = 1 - Math.pow(1 - progress, 2)
+                const speed = 10 + easeOut * 190 // 10ms → 200ms
 
                 setTimeout(() => requestAnimationFrame(animate), speed)
             } else {
-                // 停止
-                displayText.value = targetNumber
-                currentNumber.value = targetNumber
-                history.value = data.history
-                isSpinning.value = false
-                playWin()
+                // 停止前に少し待つ
+                setTimeout(() => {
+                    displayText.value = targetNumber
+                    currentNumber.value = targetNumber
+                    history.value = data.history
+                    isSpinning.value = false
+                    playWin()
+                }, 150)
             }
         }
         animate()
