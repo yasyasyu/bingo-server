@@ -34,20 +34,10 @@ const getLabel = (index: number) => String.fromCharCode(65 + index) // A, B, C, 
 <template>
     <div class="setup-panel">
         <p class="description">誰がどのプレゼントを手にするのでしょうか？</p>
-        <div class="inputs-container">
-            <div class="inputs-row">
-                <div v-for="i in 4" :key="i - 1" class="input-group">
-                    <label>{{ getLabel(i - 1) }}</label>
-                    <input v-if="inputItems.length > i - 1" v-model="inputItems[i - 1]" placeholder="Name..."
-                        @blur="handleBlur" />
-                </div>
-            </div>
-            <div class="inputs-row">
-                <div v-for="i in 4" :key="i + 3" class="input-group">
-                    <label>{{ getLabel(i + 3) }}</label>
-                    <input v-if="inputItems.length > i + 3" v-model="inputItems[i + 3]" placeholder="Name..."
-                        @blur="handleBlur" />
-                </div>
+        <div class="inputs-container-grid">
+            <div v-for="(item, index) in inputItems" :key="index" class="input-group">
+                <label>{{ getLabel(index) }}</label>
+                <input v-model="inputItems[index]" placeholder="Name..." @blur="handleBlur" />
             </div>
         </div>
         <button @click="handleStart" :disabled="isLoading" class="start-btn">
@@ -59,10 +49,10 @@ const getLabel = (index: number) => String.fromCharCode(65 + index) // A, B, C, 
 <style scoped>
 .setup-panel {
     background: rgba(0, 0, 0, 0.6);
-    padding: 20px 50px;
+    padding: 50px 50px;
     border-radius: 15px;
     text-align: center;
-    max-width: 1600px;
+    max-width: 1800px;
     width: 90%;
 }
 
@@ -72,9 +62,9 @@ const getLabel = (index: number) => String.fromCharCode(65 + index) // A, B, C, 
     margin: 20px 0 40px 0;
 }
 
-.inputs-container {
+.inputs-container-grid {
     display: flex;
-    flex-direction: column;
+    overflow-wrap: anywhere;
     gap: 50px;
     margin-bottom: 50px;
     width: 100%;
@@ -102,13 +92,14 @@ const getLabel = (index: number) => String.fromCharCode(65 + index) // A, B, C, 
 }
 
 .input-group input {
-    padding: 20px 15px;
+    padding: 10px 10px;
     border-radius: 10px;
     border: none;
     width: 100%;
-    max-width: 250px;
+    max-width: 260px;
+    height: 70px;
     text-align: center;
-    font-size: 1.8rem;
+    font-size: 1.5rem;
 }
 
 .start-btn {

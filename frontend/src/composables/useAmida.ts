@@ -3,6 +3,7 @@ import { amidaApi } from '../services/amidaApi'
 
 // Global State
 const items = ref<string[]>(new Array(8).fill(''))
+const prizeCount = ref(8)
 const isConfigured = ref(false)
 const isLoading = ref(false)
 const error = ref<string | null>(null)
@@ -13,13 +14,24 @@ export function useAmida() {
         isLoading.value = true
         try {
             const data = await amidaApi.fetchSettings()
+            // Fallback to 8 if prize_count is missing (e.g. old backend)
+            prizeCount.value = data.prize_count || 8
+
+            let fetchedItems = data.items
+            // Resize to match prizeCount
+            if (fetchedItems.length < prizeCount.value) {
+                fetchedItems = [...fetchedItems, ...new Array(prizeCount.value - fetchedItems.length).fill('')]
+            } else if (fetchedItems.length > prizeCount.value) {
+                fetchedItems = fetchedItems.slice(0, prizeCount.value)
+            }
 
             // Check if items are actually set (not all empty)
-            const hasContent = data.items.some(item => item.trim() !== '')
+            const hasContent = fetchedItems.some(item => item.trim() !== '')
             if (hasContent) {
-                items.value = data.items
+                items.value = fetchedItems
                 isConfigured.value = true
             } else {
+                items.value = new Array(prizeCount.value).fill('')
                 isConfigured.value = false
             }
             seed.value = data.seed
@@ -36,6 +48,7 @@ export function useAmida() {
             console.log('Setting up Amida with items:', newItems)
             const data = await amidaApi.updateSettings(newItems)
             items.value = data.items
+            prizeCount.value = data.prize_count
             isConfigured.value = true
         } catch (e) {
             error.value = e instanceof Error ? e.message : 'Unknown error'
@@ -60,6 +73,7 @@ export function useAmida() {
 
     return {
         items,
+        prizeCount,
         isConfigured,
         isLoading,
         error,

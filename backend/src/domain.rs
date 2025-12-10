@@ -4,7 +4,7 @@ use std::{fmt, usize};
 /// あみだくじゲームのドメインロジック
 pub struct AmidaGame {
     /// 参加者数
-    count: usize,
+    pub count: usize,
     /// 参加者名リスト
     pub gests: Vec<String>,
     /// 景品番号リスト (内部でシャッフルされる)
