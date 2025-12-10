@@ -3,7 +3,7 @@ use crate::rng::{MersenneTwister, XorShift};
 use std::sync::{Arc, Mutex};
 
 const BINGO_MAX_NUMBER: usize = 75;
-const AMIDA_PRIZES_COUNT: usize = 10;
+const AMIDA_PRIZES_COUNT: usize = 8;
 
 /// アプリケーション全体の状態を管理する構造体
 ///

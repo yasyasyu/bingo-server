@@ -2,7 +2,7 @@ import { ref } from 'vue'
 import { amidaApi } from '../services/amidaApi'
 
 // Global State
-const items = ref<string[]>(new Array(10).fill(''))
+const items = ref<string[]>(new Array(8).fill(''))
 const isConfigured = ref(false)
 const isLoading = ref(false)
 const error = ref<string | null>(null)
@@ -33,6 +33,7 @@ export function useAmida() {
     const setupAmida = async (newItems: string[]) => {
         isLoading.value = true
         try {
+            console.log('Setting up Amida with items:', newItems)
             const data = await amidaApi.updateSettings(newItems)
             items.value = data.items
             isConfigured.value = true
@@ -47,6 +48,7 @@ export function useAmida() {
         isLoading.value = true
         try {
             const data = await amidaApi.fetchResults()
+            console.log('Fetched Amida results:', data.items)
             return data.items
         } catch (e) {
             error.value = e instanceof Error ? e.message : 'Unknown error'

@@ -28,7 +28,7 @@ defineEmits<{
     display: flex;
     flex-direction: column;
     gap: 10px;
-    margin-bottom: 30px;
+    margin-bottom: 60px;
     bottom: 10px;
     right: 5px;
     position: absolute;

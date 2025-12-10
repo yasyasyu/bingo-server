@@ -16,9 +16,9 @@ defineProps<{
 <style scoped>
 .history {
     background: rgba(0, 0, 0, 0.3);
-    padding: 20px;
+    padding: 10px;
     border-radius: 15px;
-    width: 80%;
+    width: 86%;
     min-height: 140px;
 }
 

@@ -17,7 +17,7 @@ const {
 } = useAmidaGame()
 
 // Setup Mode State
-const inputItems = ref<string[]>(new Array(10).fill(''))
+const inputItems = ref<string[]>(new Array(8).fill(''))
 
 onMounted(async () => {
     await fetchAmida()
@@ -109,9 +109,9 @@ const updatePrizes = async () => {
 
 .seed-display {
     position: absolute;
-    bottom: 10px;
+    bottom: 15px;
     right: 10px;
-    font-size: 1rem;
+    font-size: 1.5rem;
     color: rgba(255, 255, 255, 0.5);
     font-family: monospace;
 }
