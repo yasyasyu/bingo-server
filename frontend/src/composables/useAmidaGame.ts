@@ -6,9 +6,9 @@ export interface HorizontalLine {
 }
 
 export function useAmidaGame() {
-    const HORIZONTAL_LINES_COUNT = 15
+    const HORIZONTAL_LINES_COUNT = 16
     const horizontalLines = ref<HorizontalLine[]>([])
-    const bottomPrizes = ref<string[]>(new Array(10).fill('???'))
+    const bottomPrizes = ref<string[]>(new Array(8).fill('???'))
 
     /**
      * あみだくじの線をランダムに生成する
@@ -27,8 +27,8 @@ export function useAmidaGame() {
             const numLines = Math.floor(Math.random() * 3) + 1
 
             for (let k = 0; k < numLines; k++) {
-                // Random position 0 to 8 (since there are 9 gaps between 10 lines)
-                const leftIndex = Math.floor(Math.random() * 9)
+                // Random position 0 to 6 (since there are 7 gaps between 8 lines)
+                const leftIndex = Math.floor(Math.random() * 7)
 
                 // Check if this index or adjacent ones are already used in this level
                 if (!usedIndices.has(leftIndex) && !usedIndices.has(leftIndex - 1) && !usedIndices.has(leftIndex + 1)) {
@@ -59,10 +59,10 @@ export function useAmidaGame() {
             prizeMap.set(prize, guest)
         })
 
-        const newBottomPrizes = new Array(10).fill('???')
+        const newBottomPrizes = new Array(8).fill('???')
 
-        // 上部（1〜10の番号）からスタートして、あみだくじを辿ります
-        for (let i = 0; i < 10; i++) {
+        // 上部（1〜8の番号）からスタートして、あみだくじを辿ります
+        for (let i = 0; i < 8; i++) {
             const prizeName = (i + 1).toString()
 
             // パスをシミュレーション
@@ -79,11 +79,12 @@ export function useAmidaGame() {
 
             // ゴール地点 (currentX) に、その番号に対応するゲストを配置
             const guest = prizeMap.get(prizeName)
-            if (guest) {
+            if (guest !== undefined) {
                 newBottomPrizes[currentX] = guest
             }
         }
         bottomPrizes.value = newBottomPrizes
+        console.log('Calculated bottom prizes:', bottomPrizes.value)
     }
 
     return {

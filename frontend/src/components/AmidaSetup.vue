@@ -35,10 +35,20 @@ const getLabel = (index: number) => String.fromCharCode(65 + index) // A, B, C, 
     <div class="setup-panel">
         <h2>Enter Guest Names</h2>
         <p class="description">誰がどのプレゼントを手にするのでしょうか？</p>
-        <div class="inputs-row">
-            <div v-for="(_item, index) in inputItems" :key="index" class="input-group">
-                <label>{{ getLabel(index) }}</label>
-                <input v-model="inputItems[index]" placeholder="Name..." @blur="handleBlur" />
+        <div class="inputs-container">
+            <div class="inputs-row">
+                <div v-for="i in 4" :key="i - 1" class="input-group">
+                    <label>{{ getLabel(i - 1) }}</label>
+                    <input v-if="inputItems.length > i - 1" v-model="inputItems[i - 1]" placeholder="Name..."
+                        @blur="handleBlur" />
+                </div>
+            </div>
+            <div class="inputs-row">
+                <div v-for="i in 4" :key="i + 3" class="input-group">
+                    <label>{{ getLabel(i + 3) }}</label>
+                    <input v-if="inputItems.length > i + 3" v-model="inputItems[i + 3]" placeholder="Name..."
+                        @blur="handleBlur" />
+                </div>
             </div>
         </div>
         <button @click="handleStart" :disabled="isLoading" class="start-btn">
@@ -53,7 +63,7 @@ const getLabel = (index: number) => String.fromCharCode(65 + index) // A, B, C, 
     padding: 40px 50px;
     border-radius: 15px;
     text-align: center;
-    max-width: 1800px;
+    max-width: 1200px;
     width: 90%;
 }
 
@@ -63,11 +73,18 @@ const getLabel = (index: number) => String.fromCharCode(65 + index) // A, B, C, 
     margin: 10px 0 20px 0;
 }
 
+.inputs-container {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    margin-bottom: 30px;
+    width: 100%;
+}
+
 .inputs-row {
     display: flex;
-    justify-content: space-between;
-    gap: 15px;
-    margin-bottom: 30px;
+    justify-content: center;
+    gap: 30px;
     width: 100%;
 }
 

@@ -42,7 +42,7 @@ const shouldAnimate = () => !props.isSpinning && props.currentNumber !== null
 }
 
 .number-display {
-    font-size: 20rem;
+    font-size: 26rem;
     font-weight: bold;
     color: #c41e3a;
 }
@@ -65,7 +65,7 @@ const shouldAnimate = () => !props.isSpinning && props.currentNumber !== null
     }
 
     50% {
-        transform: scale(1.2);
+        transform: scale(1.4);
         opacity: 1;
     }
 

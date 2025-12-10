@@ -25,7 +25,7 @@ watch(isSoundEnabled, (enabled) => {
     }
 })
 
-const HORIZONTAL_LINES_COUNT = 15
+const HORIZONTAL_LINES_COUNT = 16
 
 const drawAmida = () => {
     const canvas = canvasRef.value
@@ -35,7 +35,7 @@ const drawAmida = () => {
 
     const width = canvas.width
     const height = canvas.height
-    const lineSpacing = width / 11
+    const lineSpacing = width / 9
     const startY = 50
     const endY = height - 50
     const levelHeight = (endY - startY) / HORIZONTAL_LINES_COUNT
@@ -47,7 +47,7 @@ const drawAmida = () => {
     ctx.lineWidth = 14
     ctx.lineCap = 'round'
 
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < 8; i++) {
         const x = lineSpacing * (i + 1)
         ctx.beginPath()
         ctx.moveTo(x, startY)
@@ -73,7 +73,7 @@ const animateSinglePath = async (ctx: CanvasRenderingContext2D, startIndex: numb
     if (!canvas) return null
     const width = canvas.width
     const height = canvas.height
-    const lineSpacing = width / 11
+    const lineSpacing = width / 9
     const startY = 50
     const endY = height - 50
     const levelHeight = (endY - startY) / HORIZONTAL_LINES_COUNT
@@ -130,7 +130,7 @@ const startAnimation = async (startIndex: number) => {
     if (isAnimating.value || usedStartIndices.value.has(startIndex)) return
 
     const remaining = []
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < 8; i++) {
         if (!usedStartIndices.value.has(i)) remaining.push(i)
     }
 
@@ -235,23 +235,23 @@ const getLabel = (index: number) => `No${index + 1}`
 <template>
     <div class="game-panel">
         <div class="start-buttons">
-            <button v-for="i in 10" :key="i" @click="startAnimation(i - 1)"
+            <button v-for="i in 8" :key="i" @click="startAnimation(i - 1)"
                 :disabled="isAnimating || usedStartIndices.has(i - 1)" class="choice-btn"
                 :class="{ active: activeStartIndices.has(i - 1), used: usedStartIndices.has(i - 1) }"
-                :style="{ left: `${(i) * (100 / 11)}%` }">
+                :style="{ left: `${(i) * (100 / 9)}%` }">
                 {{ getLabel(i - 1) }}
             </button>
         </div>
 
-        <canvas ref="canvasRef" width="1200" height="700" class="amida-canvas"></canvas>
+        <canvas ref="canvasRef" width="1400" height="800" class="amida-canvas"></canvas>
 
         <div class="results-row">
-            <div v-for="i in 10" :key="i" class="result-item" :class="{ highlight: lastResultIndices.has(i - 1) }"
-                :style="{ left: `${(i) * (100 / 11)}%` }">
-                <div class="guest-name">{{ revealedIndices.has(i - 1) ? bottomPrizes[i - 1] : '???' }}</div>
+            <div v-for="i in 8" :key="i" class="result-item" :class="{ highlight: lastResultIndices.has(i - 1) }"
+                :style="{ left: `${(i) * (100 / 9)}%` }">
                 <div v-if="resultMap.has(i - 1)" class="prize-number">
                     {{ getLabel(resultMap.get(i - 1)!) }}
                 </div>
+                <div class="guest-name">{{ revealedIndices.has(i - 1) ? bottomPrizes[i - 1] : '???' }}</div>
             </div>
         </div>
 
@@ -273,24 +273,24 @@ const getLabel = (index: number) => `No${index + 1}`
     flex-direction: column;
     align-items: center;
     width: 100%;
-    max-width: 1300px;
+    max-width: 1500px;
 }
 
 .start-buttons {
     position: relative;
-    width: 1200px;
-    height: 60px;
-    margin-bottom: 0;
+    width: 1400px;
+    height: 80px;
+    margin-top: 60px;
 }
 
 .choice-btn {
     position: absolute;
     transform: translateX(-50%);
     bottom: 0;
-    min-width: 40px;
-    width: 60px;
+    min-width: 50px;
+    width: 80px;
     height: auto;
-    min-height: 40px;
+    min-height: 50px;
     padding: 5px;
     border-radius: 5px;
     border: none;
@@ -299,7 +299,7 @@ const getLabel = (index: number) => `No${index + 1}`
     font-weight: bold;
     cursor: pointer;
     transition: all 0.3s;
-    font-size: 1.2rem;
+    font-size: 1.5rem;
     word-break: break-word;
     display: flex;
     align-items: center;
@@ -334,22 +334,25 @@ const getLabel = (index: number) => `No${index + 1}`
 
 .results-row {
     position: relative;
-    width: 1200px;
-    height: 60px;
-    margin-top: 0;
+    width: 1400px;
+    height: 200px;
+    margin-top: 10px;
 }
 
 .result-item {
     position: absolute;
     transform: translateX(-50%);
     top: 0;
-    width: 80px;
+    width: 150px;
     text-align: center;
-    font-size: 0.9rem;
+    font-size: 2.5rem;
     word-break: break-word;
     padding: 5px;
     border-radius: 5px;
     transition: background 0.3s;
+    line-height: 1.0;
+    color: white;
+    z-index: 5;
 }
 
 .result-item.highlight {
@@ -395,9 +398,9 @@ const getLabel = (index: number) => `No${index + 1}`
 }
 
 .prize-number {
-    font-size: 0.8rem;
+    font-size: 1.5rem;
     color: #d4af37;
-    margin-top: 2px;
+    /* margin-bottom: 5px; */
     font-weight: bold;
 }
 
