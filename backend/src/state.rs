@@ -29,7 +29,10 @@ impl AppState {
         let prize_count = fs::read_to_string("prize.txt")
             .or_else(|_| fs::read_to_string("../prize.txt"))
             .ok()
-            .and_then(|s| s.trim().parse().ok())
+            .and_then(|s| {
+                eprintln!("prize count loaded: [{}]", &s.trim().to_string());
+                Some(s.trim().parse().ok()?)
+            })
             .unwrap_or(8);
 
         Self {
