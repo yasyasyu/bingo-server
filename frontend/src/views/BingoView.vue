@@ -68,7 +68,7 @@ const getLabel = (index: number) => String.fromCharCode(65 + index)
         </div>
 
         <div class="bottom-section">
-            <BingoHistory :history="history" />
+            <BingoHistory :history="history" style="margin: auto;" />
             <BingoControls :is-spinning="isSpinning" v-model:is-sound-enabled="isSoundEnabled" @reset="resetGame" />
         </div>
 
@@ -148,6 +148,7 @@ const getLabel = (index: number) => String.fromCharCode(65 + index)
     align-items: center;
     width: 100%;
     gap: 10px;
+    flex: 1;
 }
 
 .amida-item {
