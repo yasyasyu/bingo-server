@@ -33,7 +33,6 @@ const getLabel = (index: number) => String.fromCharCode(65 + index) // A, B, C, 
 
 <template>
     <div class="setup-panel">
-        <h2>Enter Guest Names</h2>
         <p class="description">誰がどのプレゼントを手にするのでしょうか？</p>
         <div class="inputs-container-grid">
             <div v-for="(item, index) in inputItems" :key="index" class="input-group">
@@ -48,19 +47,13 @@ const getLabel = (index: number) => String.fromCharCode(65 + index) // A, B, C, 
 </template>
 
 <style scoped>
-h2 {
-    font-size: 3rem;
-    color: #d4af37;
-    margin-bottom: 10px;
-}
-
 .setup-panel {
     background: rgba(0, 0, 0, 0.6);
-    padding: 60px 80px;
-    border-radius: 20px;
+    padding: 50px 50px;
+    border-radius: 15px;
     text-align: center;
-    max-width: 1600px;
-    width: 95%;
+    max-width: 1800px;
+    width: 90%;
 }
 
 .description {
@@ -71,10 +64,16 @@ h2 {
 
 .inputs-container-grid {
     display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 40px;
+    overflow-wrap: anywhere;
+    gap: 50px;
     margin-bottom: 50px;
+    width: 100%;
+}
+
+.inputs-row {
+    display: flex;
+    justify-content: center;
+    gap: 50px;
     width: 100%;
 }
 
@@ -83,9 +82,7 @@ h2 {
     flex-direction: column;
     align-items: center;
     gap: 15px;
-    flex: 0 0 auto;
-    width: calc(25% - 40px);
-    min-width: 200px;
+    flex: 1;
 }
 
 .input-group label {
@@ -95,13 +92,14 @@ h2 {
 }
 
 .input-group input {
-    padding: 20px 15px;
+    padding: 10px 10px;
     border-radius: 10px;
     border: none;
     width: 100%;
-    max-width: 250px;
+    max-width: 260px;
+    height: 70px;
     text-align: center;
-    font-size: 1.8rem;
+    font-size: 1.5rem;
 }
 
 .start-btn {
