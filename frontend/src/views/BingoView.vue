@@ -18,7 +18,7 @@ const {
 } = useBingoGame()
 
 const { items, fetchAmida, setupAmida } = useAmida()
-const showAmidaSettings = ref(true)
+const showAmidaSettings = ref(false)
 
 onMounted(() => {
     fetchAmida()

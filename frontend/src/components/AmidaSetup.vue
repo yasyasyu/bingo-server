@@ -33,7 +33,6 @@ const getLabel = (index: number) => String.fromCharCode(65 + index) // A, B, C, 
 
 <template>
     <div class="setup-panel">
-        <h2>Enter Guest Names</h2>
         <p class="description">誰がどのプレゼントを手にするのでしょうか？</p>
         <div class="inputs-container">
             <div class="inputs-row">
@@ -60,31 +59,31 @@ const getLabel = (index: number) => String.fromCharCode(65 + index) // A, B, C, 
 <style scoped>
 .setup-panel {
     background: rgba(0, 0, 0, 0.6);
-    padding: 40px 50px;
+    padding: 20px 50px;
     border-radius: 15px;
     text-align: center;
-    max-width: 1200px;
+    max-width: 1600px;
     width: 90%;
 }
 
 .description {
     color: rgba(255, 255, 255, 0.8);
-    font-size: 0.95rem;
-    margin: 10px 0 20px 0;
+    font-size: 2.2rem;
+    margin: 20px 0 40px 0;
 }
 
 .inputs-container {
     display: flex;
     flex-direction: column;
-    gap: 30px;
-    margin-bottom: 30px;
+    gap: 50px;
+    margin-bottom: 50px;
     width: 100%;
 }
 
 .inputs-row {
     display: flex;
     justify-content: center;
-    gap: 30px;
+    gap: 50px;
     width: 100%;
 }
 
@@ -92,32 +91,32 @@ const getLabel = (index: number) => String.fromCharCode(65 + index) // A, B, C, 
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 10px;
+    gap: 15px;
     flex: 1;
 }
 
 .input-group label {
     font-weight: bold;
-    font-size: 1.5rem;
+    font-size: 2.5rem;
     color: #d4af37;
 }
 
 .input-group input {
-    padding: 15px 10px;
-    border-radius: 5px;
+    padding: 20px 15px;
+    border-radius: 10px;
     border: none;
     width: 100%;
-    max-width: 150px;
+    max-width: 250px;
     text-align: center;
-    font-size: 1rem;
+    font-size: 1.8rem;
 }
 
 .start-btn {
-    padding: 10px 30px;
-    font-size: 1.2rem;
+    padding: 20px 60px;
+    font-size: 3rem;
     background: #d4af37;
     border: none;
-    border-radius: 25px;
+    border-radius: 35px;
     cursor: pointer;
     font-weight: bold;
     color: #1a472a;
