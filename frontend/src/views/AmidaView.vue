@@ -23,7 +23,7 @@ const inputItems = ref<string[]>([])
 onMounted(async () => {
     await fetchAmida()
     initGame(prizeCount.value)
-    
+
     if (isConfigured.value) {
         inputItems.value = [...items.value]
         if (route.path === '/amida/result') {

@@ -132,7 +132,7 @@ const startAnimation = async (startIndex: number) => {
     if (isAnimating.value || usedStartIndices.value.has(startIndex)) return
 
     const remaining = []
-    for (let i = 0; i < 8; i++) {
+    for (let i = 0; i < count.value; i++) {
         if (!usedStartIndices.value.has(i)) remaining.push(i)
     }
 
@@ -227,6 +227,10 @@ const clearResult = () => {
 watch(() => props.horizontalLines, () => {
     nextTick(() => drawAmida())
 }, { deep: true })
+
+watch(count, () => {
+    nextTick(() => drawAmida())
+})
 
 onMounted(() => {
     drawAmida()

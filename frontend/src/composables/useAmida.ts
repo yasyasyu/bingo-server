@@ -14,7 +14,8 @@ export function useAmida() {
         isLoading.value = true
         try {
             const data = await amidaApi.fetchSettings()
-            prizeCount.value = data.prize_count
+            // Fallback to 8 if prize_count is missing (e.g. old backend)
+            prizeCount.value = data.prize_count || 8
 
             let fetchedItems = data.items
             // Resize to match prizeCount

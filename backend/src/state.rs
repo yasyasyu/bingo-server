@@ -1,7 +1,7 @@
 use crate::domain::{AmidaGame, BingoGame};
 use crate::rng::{MersenneTwister, XorShift};
-use std::sync::{Arc, Mutex};
 use std::fs;
+use std::sync::{Arc, Mutex};
 
 const BINGO_MAX_NUMBER: usize = 75;
 

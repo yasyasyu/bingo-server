@@ -9,11 +9,14 @@ export function useAmidaGame() {
     const HORIZONTAL_LINES_COUNT = 16
     const prizeCount = ref(8)
     const horizontalLines = ref<HorizontalLine[]>([])
-    const bottomPrizes = ref<string[]>(new Array(8).fill('???'))
+    const bottomPrizes = ref<string[]>([])
 
     const initGame = (count: number) => {
-        prizeCount.value = count
-        bottomPrizes.value = new Array(count).fill('???')
+        const safeCount = count || 8
+        prizeCount.value = safeCount
+        if (bottomPrizes.value.length !== safeCount) {
+            bottomPrizes.value = new Array(safeCount).fill('???')
+        }
     }
 
     /**
