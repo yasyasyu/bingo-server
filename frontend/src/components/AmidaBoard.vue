@@ -89,8 +89,8 @@ const animateSinglePath = async (ctx: CanvasRenderingContext2D, startIndex: numb
 
         // 1. Go down to mid of level
         await animateLine(ctx,
-            lineSpacing * (currentXIndex + 1) + offset, currentY + offset,
-            lineSpacing * (currentXIndex + 1) + offset, midY + offset,
+            lineSpacing * (currentXIndex + 1), currentY + offset,
+            lineSpacing * (currentXIndex + 1), midY + offset,
             color, lineWidth
         )
         currentY = midY
@@ -102,8 +102,8 @@ const animateSinglePath = async (ctx: CanvasRenderingContext2D, startIndex: numb
             // Cross over
             const targetXIndex = hLine.leftIndex === currentXIndex ? currentXIndex + 1 : currentXIndex - 1
             await animateLine(ctx,
-                lineSpacing * (currentXIndex + 1) + offset, currentY + offset,
-                lineSpacing * (targetXIndex + 1) + offset, currentY + offset,
+                lineSpacing * (currentXIndex + 1), currentY + offset,
+                lineSpacing * (targetXIndex + 1), currentY + offset,
                 color, lineWidth
             )
             currentXIndex = targetXIndex
@@ -111,8 +111,8 @@ const animateSinglePath = async (ctx: CanvasRenderingContext2D, startIndex: numb
 
         // 3. Go down to bottom of level
         await animateLine(ctx,
-            lineSpacing * (currentXIndex + 1) + offset, currentY + offset,
-            lineSpacing * (currentXIndex + 1) + offset, nextY + offset,
+            lineSpacing * (currentXIndex + 1), currentY + offset,
+            lineSpacing * (currentXIndex + 1), nextY + offset,
             color, lineWidth
         )
         currentY = nextY
@@ -120,8 +120,8 @@ const animateSinglePath = async (ctx: CanvasRenderingContext2D, startIndex: numb
 
     // Final segment to bottom
     await animateLine(ctx,
-        lineSpacing * (currentXIndex + 1) + offset, currentY + offset,
-        lineSpacing * (currentXIndex + 1) + offset, endY + offset,
+        lineSpacing * (currentXIndex + 1), currentY + offset,
+        lineSpacing * (currentXIndex + 1), endY + offset,
         color, lineWidth
     )
 
@@ -157,8 +157,8 @@ const startAnimation = async (startIndex: number) => {
     // Animation Loop
     // Colors: If 2 targets (last 2), use Red and Blue. Otherwise Red.
     const isDual = targets.length === 2
-    const colors = isDual ? ['#ff0000', '#0088ff'] : ['#ff0000']
-    const offsets = isDual ? [-3, 3] : [0]
+    const colors = isDual ? ['#ff0000', '#0000ff'] : ['#ff0000']
+    const offsets = isDual ? [-2, 2] : [0]
     const lineWidths = isDual ? [6, 6] : [8]
 
     if (isSoundEnabled.value) {

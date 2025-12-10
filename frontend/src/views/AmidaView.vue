@@ -103,12 +103,12 @@ const updatePrizes = async () => {
 }
 
 .title {
+    padding-top: 20px;
     font-size: 3rem;
     color: #d4af37;
     position: absolute;
     top: 0;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-    margin-bottom: 20px;
     font-family: cursive;
     margin-block-start: 0;
 }
