@@ -49,6 +49,16 @@ npm run dev
 - **ビンゴ**: `http://localhost:5173/`
 - **あみだくじ**: `http://localhost:5173/amida`
 
+## ⚙️ 設定
+
+### 景品数の変更 (あみだくじ)
+あみだくじの景品数（参加者数）は、ルートディレクトリの `prize.txt` で設定できます。
+デフォルトは `8` です。変更後はバックエンドの再起動が必要です。
+
+```text
+8
+```
+
 ## 🛠️ 技術スタック
 - **Backend**: Rust, Axum, Tokio
 - **Frontend**: Vue.js 3, TypeScript, Vite

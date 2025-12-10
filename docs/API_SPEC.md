@@ -99,6 +99,7 @@ curl -X POST http://localhost:3000/reset
 ```json
 {
   "items": ["Guest A", "Guest B", ...],
+  "prize_count": 8,
   "message": "Success",
   "seed": 123456789
 }
@@ -107,6 +108,7 @@ curl -X POST http://localhost:3000/reset
 | フィールド | 型 | 説明 |
 | :--- | :--- | :--- |
 | `items` | `array<string>` | 現在設定されている参加者名リスト。未設定の箇所は空文字が含まれる場合がある。 |
+| `prize_count` | `integer` | 現在設定されている景品（参加者）の総数。 |
 | `message` | `string` | "Success" |
 | `seed` | `integer` | 現在の乱数生成に使用されているシード値。 |
 
@@ -135,13 +137,14 @@ curl -X GET http://localhost:3000/amida
 
 | フィールド | 型 | 説明 |
 | :--- | :--- | :--- |
-| `items` | `array<string>` | 設定する参加者名リスト（10名分）。 |
+| `items` | `array<string>` | 設定する参加者名リスト（`prize_count` 分）。 |
 
 #### レスポンス
 
 ```json
 {
   "items": ["Guest A", "Guest B", ...],
+  "prize_count": 8,
   "message": "Updated",
   "seed": 123456789
 }
@@ -150,6 +153,7 @@ curl -X GET http://localhost:3000/amida
 | フィールド | 型 | 説明 |
 | :--- | :--- | :--- |
 | `items` | `array<string>` | 更新後の参加者名リスト。 |
+| `prize_count` | `integer` | 現在設定されている景品（参加者）の総数。 |
 | `message` | `string` | "Updated" |
 | `seed` | `integer` | 現在の乱数生成に使用されているシード値。 |
 
