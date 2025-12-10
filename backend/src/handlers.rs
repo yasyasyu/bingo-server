@@ -27,6 +27,8 @@ pub struct AmidaRequest {
 pub struct AmidaResponse {
     /// 現在の参加者名リスト
     pub items: Vec<String>,
+    /// 景品の数
+    pub prize_count: usize,
     /// ステータスメッセージ
     pub message: String,
     /// 使用されているシード値
@@ -103,6 +105,7 @@ pub async fn get_amida(State(state): State<AppState>) -> Json<AmidaResponse> {
     let amida = state.amida.lock().unwrap();
     Json(AmidaResponse {
         items: amida.gests.clone(),
+        prize_count: amida.count,
         message: "Success".to_string(),
         seed: state.seed,
     })
@@ -126,6 +129,7 @@ pub async fn set_amida(
     amida.update(payload.items);
     Json(AmidaResponse {
         items: amida.gests.clone(),
+        prize_count: amida.count,
         message: "Updated".to_string(),
         seed: state.seed,
     })

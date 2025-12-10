@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, watch, nextTick } from 'vue'
+import { ref, onMounted, watch, nextTick, computed } from 'vue'
 import type { HorizontalLine } from '../composables/useAmidaGame'
 import { useDrumRoll } from '../composables/useDrumRoll'
 
@@ -7,6 +7,8 @@ const props = defineProps<{
     horizontalLines: HorizontalLine[]
     bottomPrizes: string[]
 }>()
+
+const count = computed(() => props.bottomPrizes.length)
 
 const canvasRef = ref<HTMLCanvasElement | null>(null)
 const activeStartIndices = ref<Set<number>>(new Set())
@@ -35,7 +37,7 @@ const drawAmida = () => {
 
     const width = canvas.width
     const height = canvas.height
-    const lineSpacing = width / 9
+    const lineSpacing = width / (count.value + 1)
     const startY = 50
     const endY = height - 50
     const levelHeight = (endY - startY) / HORIZONTAL_LINES_COUNT
@@ -47,7 +49,7 @@ const drawAmida = () => {
     ctx.lineWidth = 14
     ctx.lineCap = 'round'
 
-    for (let i = 0; i < 8; i++) {
+    for (let i = 0; i < count.value; i++) {
         const x = lineSpacing * (i + 1)
         ctx.beginPath()
         ctx.moveTo(x, startY)
@@ -73,7 +75,7 @@ const animateSinglePath = async (ctx: CanvasRenderingContext2D, startIndex: numb
     if (!canvas) return null
     const width = canvas.width
     const height = canvas.height
-    const lineSpacing = width / 9
+    const lineSpacing = width / (count.value + 1)
     const startY = 50
     const endY = height - 50
     const levelHeight = (endY - startY) / HORIZONTAL_LINES_COUNT
@@ -235,10 +237,10 @@ const getLabel = (index: number) => `No${index + 1}`
 <template>
     <div class="game-panel">
         <div class="start-buttons">
-            <button v-for="i in 8" :key="i" @click="startAnimation(i - 1)"
+            <button v-for="i in count" :key="i" @click="startAnimation(i - 1)"
                 :disabled="isAnimating || usedStartIndices.has(i - 1)" class="choice-btn"
                 :class="{ active: activeStartIndices.has(i - 1), used: usedStartIndices.has(i - 1) }"
-                :style="{ left: `${(i) * (100 / 9)}%` }">
+                :style="{ left: `${(i) * (100 / (count + 1))}%` }">
                 {{ getLabel(i - 1) }}
             </button>
         </div>
@@ -246,8 +248,8 @@ const getLabel = (index: number) => `No${index + 1}`
         <canvas ref="canvasRef" width="1400" height="800" class="amida-canvas"></canvas>
 
         <div class="results-row">
-            <div v-for="i in 8" :key="i" class="result-item" :class="{ highlight: lastResultIndices.has(i - 1) }"
-                :style="{ left: `${(i) * (100 / 9)}%` }">
+            <div v-for="i in count" :key="i" class="result-item" :class="{ highlight: lastResultIndices.has(i - 1) }"
+                :style="{ left: `${(i) * (100 / (count + 1))}%` }">
                 <div v-if="resultMap.has(i - 1)" class="prize-number">
                     {{ getLabel(resultMap.get(i - 1)!) }}
                 </div>

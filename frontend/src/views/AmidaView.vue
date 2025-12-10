@@ -8,27 +8,33 @@ import AmidaBoard from '../components/AmidaBoard.vue'
 
 const router = useRouter()
 const route = useRoute()
-const { items, isConfigured, isLoading, seed, fetchAmida, setupAmida, fetchResults } = useAmida()
+const { items, prizeCount, isConfigured, isLoading, seed, fetchAmida, setupAmida, fetchResults } = useAmida()
 const {
     horizontalLines,
     bottomPrizes,
+    initGame,
     generateAmida,
     calculatePrizes
 } = useAmidaGame()
 
 // Setup Mode State
-const inputItems = ref<string[]>(new Array(8).fill(''))
+const inputItems = ref<string[]>([])
 
 onMounted(async () => {
     await fetchAmida()
+    initGame(prizeCount.value)
+    
     if (isConfigured.value) {
         inputItems.value = [...items.value]
         if (route.path === '/amida/result') {
             generateAmida()
             await updatePrizes()
         }
-    } else if (route.path === '/amida/result') {
-        router.replace('/amida')
+    } else {
+        inputItems.value = new Array(prizeCount.value).fill('')
+        if (route.path === '/amida/result') {
+            router.replace('/amida')
+        }
     }
 })
 

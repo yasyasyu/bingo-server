@@ -7,8 +7,14 @@ export interface HorizontalLine {
 
 export function useAmidaGame() {
     const HORIZONTAL_LINES_COUNT = 16
+    const prizeCount = ref(8)
     const horizontalLines = ref<HorizontalLine[]>([])
     const bottomPrizes = ref<string[]>(new Array(8).fill('???'))
+
+    const initGame = (count: number) => {
+        prizeCount.value = count
+        bottomPrizes.value = new Array(count).fill('???')
+    }
 
     /**
      * あみだくじの線をランダムに生成する
@@ -18,6 +24,8 @@ export function useAmidaGame() {
      */
     const generateAmida = () => {
         const lines: HorizontalLine[] = []
+        const count = prizeCount.value
+        const gaps = count - 1
         // Generate random horizontal lines
         // Ensure no overlapping lines at same level
         for (let level = 0; level < HORIZONTAL_LINES_COUNT; level++) {
@@ -27,8 +35,8 @@ export function useAmidaGame() {
             const numLines = Math.floor(Math.random() * 3) + 1
 
             for (let k = 0; k < numLines; k++) {
-                // Random position 0 to 6 (since there are 7 gaps between 8 lines)
-                const leftIndex = Math.floor(Math.random() * 7)
+                // Random position 0 to gaps-1
+                const leftIndex = Math.floor(Math.random() * gaps)
 
                 // Check if this index or adjacent ones are already used in this level
                 if (!usedIndices.has(leftIndex) && !usedIndices.has(leftIndex - 1) && !usedIndices.has(leftIndex + 1)) {
@@ -59,10 +67,11 @@ export function useAmidaGame() {
             prizeMap.set(prize, guest)
         })
 
-        const newBottomPrizes = new Array(8).fill('???')
+        const count = prizeCount.value
+        const newBottomPrizes = new Array(count).fill('???')
 
-        // 上部（1〜8の番号）からスタートして、あみだくじを辿ります
-        for (let i = 0; i < 8; i++) {
+        // 上部（1〜countの番号）からスタートして、あみだくじを辿ります
+        for (let i = 0; i < count; i++) {
             const prizeName = (i + 1).toString()
 
             // パスをシミュレーション
@@ -91,6 +100,8 @@ export function useAmidaGame() {
         HORIZONTAL_LINES_COUNT,
         horizontalLines,
         bottomPrizes,
+        prizeCount,
+        initGame,
         generateAmida,
         calculatePrizes
     }

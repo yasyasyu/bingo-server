@@ -1,9 +1,9 @@
 use crate::domain::{AmidaGame, BingoGame};
 use crate::rng::{MersenneTwister, XorShift};
 use std::sync::{Arc, Mutex};
+use std::fs;
 
 const BINGO_MAX_NUMBER: usize = 75;
-const AMIDA_PRIZES_COUNT: usize = 8;
 
 /// アプリケーション全体の状態を管理する構造体
 ///
@@ -26,13 +26,19 @@ impl AppState {
     /// あみだくじの乱数生成器は、ビンゴの乱数生成器と状態が重ならないように
     /// シード値をシフトして初期化されます。
     pub fn new(seed: u32) -> Self {
+        let prize_count = fs::read_to_string("prize.txt")
+            .or_else(|_| fs::read_to_string("../prize.txt"))
+            .ok()
+            .and_then(|s| s.trim().parse().ok())
+            .unwrap_or(8);
+
         Self {
             game: Arc::new(Mutex::new(BingoGame::new(
                 BINGO_MAX_NUMBER,
                 Box::new(XorShift::new(seed)),
             ))),
             amida: Arc::new(Mutex::new(AmidaGame::new(
-                AMIDA_PRIZES_COUNT,
+                prize_count,
                 Box::new(MersenneTwister::new(seed)),
             ))),
             seed,

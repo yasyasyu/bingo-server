@@ -2,6 +2,7 @@ const API_BASE = 'http://localhost:3000'
 
 export interface AmidaResponse {
     items: string[]
+    prize_count: number
     message: string
     seed: number
 }
